@@ -147,6 +147,10 @@
   .gradient-success {
     background: var(--gradient-success);
   }
+
+  .gradient-card {
+    background: var(--gradient-card);
+  }
   
   .shadow-glow {
     box-shadow: var(--shadow-glow);
