@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Guru\ClassRoomController;
 use App\Http\Controllers\Guru\GuruDashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Siswa\SiswaDashboardController;
@@ -30,6 +31,10 @@ Route::middleware('auth')->group(function () {
 // Guru
 Route::middleware(['role:guru'])->prefix('guru')->name('guru.')->group(function () {
     Route::get('/dashboard', [GuruDashboardController::class, 'dashboard'])->name('dashboard');
+
+    // classroom
+    Route::get('/classrooms', [ClassRoomController::class, 'index'])->name('classroom.index');
+    Route::post('/classrooms', [ClassRoomController::class, 'store'])->name('classroom.store');
 });
 
 // Siswa

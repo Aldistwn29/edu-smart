@@ -46,4 +46,33 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function teachingClasses()
+    {
+        return $this->hasMany(ClassRoom::class, 'teacher_id');
+    }
+
+    public function enrolledClasses()
+    {
+        return $this->belongsToMany(ClassRoom::class, 'classroom_user', 'user_id', 'class_room_id')
+            ->withTimestamps();
+    }
+
+    public function quizzes()
+    {
+        return $this->hasMany(Quize::class, 'teacher_id');
+    }
+
+    public function attempts()
+    {
+        return $this->hasMany(QuizAttempt::class, 'student_id');
+    }
+
+    public function materials()
+    {
+        return $this->hasMany(Material::class, 'teacher_id');
+    }
+
+    // relasi ke chatbot
+
 }

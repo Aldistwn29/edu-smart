@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import {
     BookOpen,
     ClipboardList,
+    DoorOpen,
     GraduationCap,
     LayoutDashboard,
     LogOut,
@@ -32,6 +33,11 @@ export default function DashbordLayout({ children }) {
                       icon: LayoutDashboard,
                       label: 'Dashboard',
                       href: route('guru.dashboard'),
+                  },
+                  {
+                      icon: DoorOpen,
+                      label: 'Kelas',
+                      href: route('guru.classroom.index'),
                   },
                   { icon: BookOpen, label: 'Mata Pelajaran', href: '#' },
                   { icon: ClipboardList, label: 'Quiz', href: '#' },
