@@ -4,7 +4,12 @@ import * as React from 'react';
 
 import { cn } from '@/lib/utils';
 
+/**
+ * Konfigurasi varian button menggunakan class-variance-authority (cva)
+ * Mengatur style dasar dan varian berdasarkan props variant dan size
+ */
 const buttonVariants = cva(
+    // Style dasar untuk semua button
     'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
     {
         variants: {
@@ -19,6 +24,7 @@ const buttonVariants = cva(
                     'bg-secondary text-secondary-foreground hover:bg-secondary/80',
                 ghost: 'hover:bg-accent hover:text-accent-foreground',
                 link: 'text-primary underline-offset-4 hover:underline',
+                // Varian custom
                 hero: 'gradient-primary text-primary-foreground shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]',
                 success:
                     'gradient-success text-success-foreground shadow-md hover:shadow-lg',
@@ -39,6 +45,15 @@ const buttonVariants = cva(
     },
 );
 
+/**
+ * Komponen Button
+ * @param {Object} props - Properti komponen
+ * @param {string} props.className - Class tambahan untuk styling
+ * @param {string} props.variant - Varian tampilan button (default, destructive, outline, secondary, ghost, link, hero, success, glass)
+ * @param {string} props.size - Ukuran button (default, sm, lg, xl, icon)
+ * @param {boolean} props.asChild - Jika true, merender elemen anak sebagai komponen utama (misal untuk Link)
+ * @param {React.Ref} ref - Ref React
+ */
 const Button = React.forwardRef(
     ({ className, variant, size, asChild = false, ...props }, ref) => {
         const Comp = asChild ? Slot : 'button';
