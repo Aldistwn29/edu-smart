@@ -35,6 +35,7 @@ Route::middleware(['role:guru'])->prefix('guru')->name('guru.')->group(function 
     // classroom
     Route::get('/classrooms', [ClassRoomController::class, 'index'])->name('classroom.index');
     Route::post('/classrooms', [ClassRoomController::class, 'store'])->name('classroom.store');
+    Route::get('/classrooms/{classRoom}', [ClassRoomController::class, 'show'])->name('classroom.show');
 });
 
 // Siswa

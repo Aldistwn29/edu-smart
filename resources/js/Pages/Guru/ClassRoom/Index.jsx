@@ -18,8 +18,8 @@ import {
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import DashboardLayout from '@/Layouts/DashboardLayout';
-import { Head, useForm } from '@inertiajs/react';
-import { BookOpen, Copy, MoreVertical, PlusCircle, User } from 'lucide-react';
+import { Head, Link, useForm } from '@inertiajs/react';
+import { BookOpen, Copy, PlusCircle, User } from 'lucide-react';
 import { useState } from 'react';
 
 export default function Index({ classrooms }) {
@@ -270,27 +270,17 @@ export default function Index({ classrooms }) {
                                         </div>
                                     </div>
                                 </div>
-
-                                <div className="flex gap-3">
+                                <Link
+                                    href={route('guru.classroom.show', cls.id)}
+                                    className="w-full"
+                                >
                                     <Button
                                         variant="default"
                                         className="h-11 w-full gap-2 rounded-2xl font-bold shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
-                                        onClick={() =>
-                                            (window.location.href = route(
-                                                'guru.classroom.index',
-                                            ))
-                                        } // placeholder redirect
                                     >
                                         Kelola Kelas
                                     </Button>
-                                    <Button
-                                        variant="outline"
-                                        size="icon"
-                                        className="h-11 w-11 shrink-0 rounded-2xl border-border/50 bg-background transition-all hover:bg-muted active:scale-90"
-                                    >
-                                        <MoreVertical className="h-5 w-5 opacity-70" />
-                                    </Button>
-                                </div>
+                                </Link>
                             </CardContent>
                         </Card>
                     ))}

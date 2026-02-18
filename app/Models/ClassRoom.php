@@ -40,12 +40,12 @@ class ClassRoom extends Model
 
     public function materials()
     {
-        return $this->hasMany(Material::class);
+        return $this->hasMany(Material::class, 'class_id');
     }
 
     public function quizzes()
     {
-        return $this->hasMany(Quize::class);
+        return $this->hasMany(Quize::class, 'class_id');
     }
 
     public function assigments()

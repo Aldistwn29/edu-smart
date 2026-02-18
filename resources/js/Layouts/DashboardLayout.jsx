@@ -115,7 +115,7 @@ export default function DashbordLayout({ children }) {
                         }
                         return (
                             <Link
-                                key={item.href}
+                                key={item.label}
                                 href={item.href}
                                 className={`flex w-full items-center rounded-xl px-2 py-3 transition-all ${
                                     sidebarOpen
@@ -127,7 +127,7 @@ export default function DashbordLayout({ children }) {
                                         : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                                 }`}
                             >
-                                <item.icon className="flex-sharink-0 h-5 w-5" />
+                                <item.icon className="h-5 w-5 flex-shrink-0" />
                                 {sidebarOpen && (
                                     <span className="truncate text-sm font-medium">
                                         {item.label}
@@ -192,7 +192,7 @@ export default function DashbordLayout({ children }) {
                                 }
                                 return (
                                     <Link
-                                        key={item.href}
+                                        key={item.label}
                                         href={item.href}
                                         onClick={() => setmobileMenuOpen(false)}
                                         className={`flex items-center gap-3 rounded-xl px-4 py-3 ${
