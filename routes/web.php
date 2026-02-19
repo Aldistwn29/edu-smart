@@ -3,6 +3,7 @@
 use App\Http\Controllers\Guru\ClassRoomController;
 use App\Http\Controllers\Guru\GuruDashboardController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Siswa\ClassRoomController as SiswaClassRoomController;
 use App\Http\Controllers\Siswa\SiswaDashboardController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -41,5 +42,9 @@ Route::middleware(['role:guru'])->prefix('guru')->name('guru.')->group(function 
 // Siswa
 Route::middleware(['role:siswa'])->prefix('siswa')->name('siswa.')->group(function () {
     Route::get('/dashboard', [SiswaDashboardController::class, 'dashboard'])->name('dashboard');
+
+    // Classroom
+    Route::get('/classrooms', [SiswaClassRoomController::class, 'index'])->name('classroom.index');
+    Route::post('/classrooms', [SiswaClassRoomController::class, 'join'])->name('classroom.join');
 });
 require __DIR__.'/auth.php';

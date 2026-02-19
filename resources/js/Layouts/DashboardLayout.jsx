@@ -50,6 +50,11 @@ export default function DashbordLayout({ children }) {
                       label: 'Dashboard',
                       href: route('siswa.dashboard'),
                   },
+                  {
+                      icon: DoorOpen,
+                      label: 'Kelas',
+                      href: route('siswa.classroom.index'),
+                  },
                   { icon: BookOpen, label: 'Mata Pelajaran', href: '#' },
                   { icon: ClipboardList, label: 'Quiz', href: '#' },
                   { icon: Notebook, label: 'Penugasan', href: '#' },
