@@ -46,5 +46,6 @@ Route::middleware(['role:siswa'])->prefix('siswa')->name('siswa.')->group(functi
     // Classroom
     Route::get('/classrooms', [SiswaClassRoomController::class, 'index'])->name('classroom.index');
     Route::post('/classrooms', [SiswaClassRoomController::class, 'join'])->name('classroom.join');
+    Route::get('/classrooms/{classroom}', [SiswaClassRoomController::class, 'show'])->name('classroom.show');
 });
 require __DIR__.'/auth.php';

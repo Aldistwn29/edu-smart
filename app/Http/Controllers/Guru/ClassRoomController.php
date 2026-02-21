@@ -44,11 +44,32 @@ class ClassRoomController extends Controller
             abort(403);
         }
 
-        return Inertia::render('Guru/ClassRoom/Show', [
-            'classroom' => $classRoom->load(['students']),
-            'materials' => $classRoom->materials()->latest()->get(),
-            'quizzes' => $classRoom->quizzes()->latest()->get(),
+        // Load classroom with student counts
+        $classRoom->loadCount(['students', 'materials', 'quizzes'])->load([
+            'students' => function ($query) {
+                $query->select('users.id', 'users.name', 'users.email')->orderBy('name', 'asc');
+            }
         ]);
 
+        // Fetch materials with human-friendly dates
+        $materials = $classRoom->materials()
+            ->latest()
+            ->get()
+            ->map(function ($material) {
+                $material->created_at_human = $material->created_at->diffForHumans();
+                return $material;
+            });
+
+        // Fetch quizzes with question counts
+        $quizzes = $classRoom->quizzes()
+            ->withCount('questions')
+            ->latest()
+            ->get();
+
+        return Inertia::render('Guru/ClassRoom/Show', [
+            'classroom' => $classRoom,
+            'materials' => $materials,
+            'quizzes' => $quizzes,
+        ]);
     }
 }

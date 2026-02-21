@@ -9,7 +9,7 @@ import {
 import { Input } from '@/Components/ui/input';
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { ArrowRight, BookOpen, LayoutGrid, Search } from 'lucide-react';
+import { ArrowRight, BookOpen, LayoutGrid, Search, User } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function Index({ classrooms }) {
@@ -61,7 +61,6 @@ export default function Index({ classrooms }) {
                                             e.target.value.toUpperCase(),
                                         )
                                     }
-                                    maxLength={6}
                                     required
                                 />
                             </div>

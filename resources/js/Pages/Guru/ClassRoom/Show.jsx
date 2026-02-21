@@ -14,9 +14,9 @@ import DashbordLayout from '@/Layouts/DashboardLayout';
 import { Head, Link } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-    ArrowLeft,
     BookOpen,
     Calendar,
+    ChevronLeft,
     ClipboardList,
     Clock,
     Download,
@@ -54,6 +54,18 @@ export default function Show({ classroom, materials, quizzes = [] }) {
             student.name.toLowerCase().includes(searchTerm.toLowerCase()),
         ) || [];
 
+    const filteredMaterials =
+        materials?.filter(
+            (m) =>
+                m.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                m.description?.toLowerCase().includes(searchTerm.toLowerCase()),
+        ) || [];
+
+    const filteredQuizzes =
+        quizzes?.filter((q) =>
+            q.title.toLowerCase().includes(searchTerm.toLowerCase()),
+        ) || [];
+
     return (
         <DashbordLayout>
             <Head title={`Kelas ${classroom.name}`} />
@@ -64,24 +76,25 @@ export default function Show({ classroom, materials, quizzes = [] }) {
                 variants={containerVariants}
                 className="space-y-8"
             >
+                {/* Top Navigation */}
+                <div className="flex items-center">
+                    <Link
+                        href={route('guru.classroom.index')}
+                        className="group flex items-center gap-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-primary"
+                    >
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-card shadow-sm ring-1 ring-border/50 transition-all group-hover:bg-primary group-hover:text-primary-foreground group-hover:ring-primary">
+                            <ChevronLeft className="h-6 w-6" />
+                        </div>
+                        Kembali ke Daftar Kelas
+                    </Link>
+                </div>
+
                 {/* Header Section */}
-                <div className="relative overflow-hidden rounded-[2.5rem] border border-border/50 bg-card p-8 text-card-foreground shadow-xl shadow-primary/5 md:p-12">
+                <div className="relative overflow-hidden rounded-[2.5rem] border border-border/50 p-8 shadow-xl shadow-primary/5 md:p-12">
                     <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-primary/5 blur-3xl" />
                     <div className="absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
 
                     <div className="relative z-10">
-                        <div className="mb-7 flex items-center justify-start md:justify-end">
-                            <Link href={route('guru.classroom.index')}>
-                                <Button
-                                    variant="outline"
-                                    className="group rounded-2xl bg-background/50 px-4 backdrop-blur-md hover:bg-muted"
-                                >
-                                    <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                                    Kembali
-                                </Button>
-                            </Link>
-                        </div>
-
                         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
                             <div className="space-y-2">
                                 <div className="flex items-center gap-3">
@@ -96,7 +109,7 @@ export default function Show({ classroom, materials, quizzes = [] }) {
                                         {classroom.academic_year}
                                     </span>
                                 </div>
-                                <h1 className="text-4xl font-black tracking-tight text-foreground md:text-6xl">
+                                <h1 className="text-5xl font-black tracking-tight text-foreground md:text-7xl">
                                     {classroom.name}
                                 </h1>
                                 <p className="flex items-center gap-2 text-lg font-medium text-muted-foreground">
@@ -105,28 +118,6 @@ export default function Show({ classroom, materials, quizzes = [] }) {
                                         {classroom.code}
                                     </span>
                                 </p>
-                            </div>
-
-                            <div className="flex gap-4">
-                                <div className="flex -space-x-4 overflow-hidden">
-                                    {classroom.students
-                                        ?.slice(0, 4)
-                                        .map((student, i) => (
-                                            <Avatar
-                                                key={i}
-                                                className="h-12 w-12 border-4 border-card ring-2 ring-primary/10 transition-transform hover:z-20 hover:scale-110"
-                                            >
-                                                <AvatarFallback className="bg-primary/10 font-bold text-primary">
-                                                    {student.name.charAt(0)}
-                                                </AvatarFallback>
-                                            </Avatar>
-                                        ))}
-                                    {classroom.students?.length > 4 && (
-                                        <div className="flex h-12 w-12 items-center justify-center rounded-full border-4 border-card bg-muted font-bold text-muted-foreground">
-                                            +{classroom.students.length - 4}
-                                        </div>
-                                    )}
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -268,8 +259,8 @@ export default function Show({ classroom, materials, quizzes = [] }) {
                             <TabsContent value="materials" className="mt-0">
                                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-1">
                                     <AnimatePresence mode="popLayout">
-                                        {materials.length > 0 ? (
-                                            materials.map((m, i) => (
+                                        {filteredMaterials.length > 0 ? (
+                                            filteredMaterials.map((m, i) => (
                                                 <motion.div
                                                     key={m.id}
                                                     variants={itemVariants}
@@ -326,12 +317,14 @@ export default function Show({ classroom, materials, quizzes = [] }) {
                                                                         variant="outline"
                                                                         className="rounded-lg text-xs"
                                                                     >
-                                                                        PDF
+                                                                        {m.type ||
+                                                                            'FILE'}
                                                                     </Badge>
                                                                     <span className="text-xs text-muted-foreground">
-                                                                        Ditambahkan
-                                                                        2 hari
-                                                                        lalu
+                                                                        Ditambahkan{' '}
+                                                                        {
+                                                                            m.created_at_human
+                                                                        }
                                                                     </span>
                                                                 </div>
                                                             </div>
@@ -365,8 +358,8 @@ export default function Show({ classroom, materials, quizzes = [] }) {
                             <TabsContent value="quizzes" className="mt-0">
                                 <div className="grid grid-cols-1 gap-4">
                                     <AnimatePresence mode="popLayout">
-                                        {quizzes.length > 0 ? (
-                                            quizzes.map((q, i) => (
+                                        {filteredQuizzes.length > 0 ? (
+                                            filteredQuizzes.map((q, i) => (
                                                 <motion.div
                                                     key={q.id}
                                                     variants={itemVariants}
@@ -399,7 +392,7 @@ export default function Show({ classroom, materials, quizzes = [] }) {
                                                                             </Badge>
                                                                             <span className="flex items-center gap-1 text-xs text-muted-foreground">
                                                                                 <Clock className="h-3 w-3" />
-                                                                                {q.duration ||
+                                                                                {q.duration_minutes ||
                                                                                     60}{' '}
                                                                                 Menit
                                                                             </span>
@@ -439,7 +432,7 @@ export default function Show({ classroom, materials, quizzes = [] }) {
                                                                         <Calendar className="h-3.5 w-3.5" />
                                                                         Deadline:{' '}
                                                                         <span className="font-medium text-foreground">
-                                                                            {q.due_date ||
+                                                                            {q.deadline ||
                                                                                 'Tidak ada'}
                                                                         </span>
                                                                     </div>
