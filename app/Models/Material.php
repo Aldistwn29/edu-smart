@@ -30,4 +30,9 @@ class Material extends Model
     {
         return $this->belongsTo(User::class, 'teacher_id');
     }
+
+    public function logs()
+    {
+        return $this->morphMany(ActivityLog::class, 'loggable');
+    }
 }

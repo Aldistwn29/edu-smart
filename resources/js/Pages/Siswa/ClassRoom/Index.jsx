@@ -160,9 +160,12 @@ export default function Index({ classrooms }) {
                                         )}
                                         className="block w-full"
                                     >
-                                        <Button className="h-11 w-full gap-2 rounded-2xl font-semibold shadow-lg shadow-primary/20 transition-all hover:scale-50 active:scale-50">
+                                        <Button
+                                            variant="default"
+                                            className="h-11 w-full gap-2 rounded-2xl font-bold shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                                        >
                                             <ArrowRight className="h-4 w-4" />
-                                            Masuk Kelas
+                                            Masuk Kela
                                         </Button>
                                     </Link>
                                 </CardContent>

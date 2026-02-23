@@ -22,6 +22,8 @@ return new class extends Migration
             $table->string('answer');
             $table->integer('points')->default(1);
             $table->integer('order')->default(0);
+
+            $table->timestamps();
         });
     }
 

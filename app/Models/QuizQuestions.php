@@ -22,7 +22,7 @@ class QuizQuestions extends Model
 
     public function quiz()
     {
-        return $this->belongsTo(Quize::class, 'quiz_id');
+        return $this->belongsTo(Quize::class, 'quize_id');
     }
 
     public function answers()

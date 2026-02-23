@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 
 class ClassRoom extends Model
 {
@@ -17,13 +16,13 @@ class ClassRoom extends Model
     ];
 
     // genrate code untuk kelas
-    public static function boot()
+    protected static function boot()
     {
         parent::boot();
-
-        // generate code untuk kelas
-        static::creating(function ($classRoom) {
-            $classRoom->code = strtoupper(Str::random(6));
+        static::creating(function ($class) {
+            if (empty($class->code)) {
+                $class->code = \Illuminate\Support\Str::upper(\Illuminate\Support\Str::random(6));
+            }
         });
     }
 

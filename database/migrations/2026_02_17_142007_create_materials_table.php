@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('title');
             $table->text('description')->nullable();
             $table->enum('type', ['video', 'link', 'file', 'text']);
-            $table->string('file_path');
+            $table->string('file_path')->nullable();
             $table->integer('order')->default(0);
             $table->timestamps();
         });

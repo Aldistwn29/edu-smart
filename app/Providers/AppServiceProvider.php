@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\ClassRoom;
+use App\Models\Material;
+use App\Models\Quize;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 
@@ -21,5 +25,12 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Vite::prefetch(concurrency: 3);
+
+        // morph map
+        Relation::enforceMorphMap([
+            'material' => Material::class,
+            'quiz' => Quize::class,
+            'classroom' => ClassRoom::class,
+        ]);
     }
 }
