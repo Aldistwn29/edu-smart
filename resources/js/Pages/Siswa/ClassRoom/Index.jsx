@@ -1,3 +1,13 @@
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/Components/ui/alert-dialog';
 import { Button } from '@/Components/ui/button';
 import {
     Card,
@@ -9,20 +19,54 @@ import {
 import { Input } from '@/Components/ui/input';
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { ArrowRight, BookOpen, LayoutGrid, Search, User } from 'lucide-react';
+import {
+    ArrowRight,
+    BookOpen,
+    LayoutGrid,
+    LogOut,
+    Search,
+    User,
+} from 'lucide-react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 
 export default function Index({ classrooms }) {
-    const { data, setData, post, processing, reset, errors } = useForm({
+    const [selectedClassroom, setSelectedClassroom] = useState(null);
+
+    const {
+        data,
+        setData,
+        post,
+        processing: joining,
+        reset,
+        errors,
+    } = useForm({
         code: '',
     });
+
+    const { delete: destroy, processing: leaving } = useForm();
 
     const handleJoin = (e) => {
         e.preventDefault();
         post(route('siswa.classroom.join'), {
             onSuccess: () => {
-                (reset(), toast.success('Berhasil bergabung ke kelas'));
+                reset();
+                toast.success('Berhasil bergabung ke kelas');
             },
+        });
+    };
+
+    const handleLeave = () => {
+        if (!selectedClassroom) return;
+
+        destroy(route('siswa.classroom.leave', selectedClassroom.id), {
+            onSuccess: () => {
+                toast.success(
+                    `Berhasil keluar dari kelas ${selectedClassroom.name}`,
+                );
+                setSelectedClassroom(null);
+            },
+            onFinish: () => setSelectedClassroom(null),
         });
     };
 
@@ -75,10 +119,10 @@ export default function Index({ classrooms }) {
                         <Button
                             form="join-class-form"
                             type="submit"
-                            disabled={processing}
+                            disabled={joining}
                             className="h-14 w-full rounded-2xl bg-primary text-lg font-bold shadow-lg shadow-primary/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98]"
                         >
-                            {processing ? (
+                            {joining ? (
                                 <div className="flex items-center gap-2">
                                     <div className="h-5 w-5 animate-spin rounded-full border-2 border-background border-t-transparent" />
                                     <span>Memproses...</span>
@@ -116,7 +160,7 @@ export default function Index({ classrooms }) {
                                 key={cls.id}
                                 className="group relative overflow-hidden rounded-sm border-border/50 bg-card/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/10"
                             >
-                                <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-primary/5 blur-3xl transition-colors group-hover:bg-primary/10" />
+                                <div className="pointer-events-none absolute -right-4 -top-4 h-24 w-24 rounded-full bg-primary/5 blur-3xl transition-colors group-hover:bg-primary/10" />
                                 <CardHeader className="pb-4">
                                     <div className="mb-4 flex items-center justify-between">
                                         <div className="flex h-12 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-inner transition-transform duration-500 group-hover:rotate-12">
@@ -127,7 +171,7 @@ export default function Index({ classrooms }) {
                                         </h1>
                                     </div>
                                     <div className="space-y-1">
-                                        <CardTitle className="font-semibol line-clamp-1 text-xl tracking-tight transition-colors group-hover:text-primary">
+                                        <CardTitle className="line-clamp-1 text-xl font-semibold tracking-tight transition-colors group-hover:text-primary">
                                             {cls.name}
                                         </CardTitle>
                                         <CardDescription className="font-medium text-primary/80">
@@ -152,28 +196,76 @@ export default function Index({ classrooms }) {
                                         </div>
                                     </div>
 
-                                    {/* Link */}
-                                    <Link
-                                        href={route(
-                                            'siswa.classroom.show',
-                                            cls.id,
-                                        )}
-                                        className="block w-full"
-                                    >
-                                        <Button
-                                            variant="default"
-                                            className="h-11 w-full gap-2 rounded-2xl font-bold shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                                    {/* Link & Leave */}
+                                    <div className="flex gap-2">
+                                        <Link
+                                            href={route(
+                                                'siswa.classroom.show',
+                                                cls.id,
+                                            )}
+                                            className="flex-1"
                                         >
-                                            <ArrowRight className="h-4 w-4" />
-                                            Masuk Kela
+                                            <Button
+                                                variant="default"
+                                                className="h-11 w-full gap-2 rounded-2xl font-bold shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                                            >
+                                                <ArrowRight className="h-4 w-4" />
+                                                Masuk Kelas
+                                            </Button>
+                                        </Link>
+
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-11 w-11 rounded-2xl text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                                            title="Keluar dari kelas"
+                                            onClick={() =>
+                                                setSelectedClassroom(cls)
+                                            }
+                                        >
+                                            <LogOut className="h-5 w-5" />
                                         </Button>
-                                    </Link>
+                                    </div>
                                 </CardContent>
                             </Card>
                         ))}
                     </div>
                 )}
             </div>
+
+            {/* Leave Confirmation Dialog */}
+            <AlertDialog
+                open={!!selectedClassroom}
+                onOpenChange={(open) => !open && setSelectedClassroom(null)}
+            >
+                <AlertDialogContent className="rounded-3xl border-none">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="text-2xl font-bold tracking-tight">
+                            Keluar dari Kelas?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="text-base font-medium">
+                            Anda akan berhenti mengikuti kelas{' '}
+                            <span className="font-bold text-foreground">
+                                {selectedClassroom?.name}
+                            </span>
+                            . Pastikan ini adalah tindakan yang sengaja
+                            dilakukan.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter className="mt-4 gap-3">
+                        <AlertDialogCancel className="h-12 rounded-2xl border-2 px-6 font-bold">
+                            Batalkan
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={handleLeave}
+                            disabled={leaving}
+                            className="h-12 rounded-2xl bg-destructive px-6 font-bold hover:bg-destructive/90"
+                        >
+                            {leaving ? 'Memproses...' : 'Ya, Keluar Kelas'}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </DashboardLayout>
     );
 }

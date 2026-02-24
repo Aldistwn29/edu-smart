@@ -25,7 +25,7 @@ class Quize extends Model
         return $this->hasMany(QuizAttempt::class);
     }
 
-    public function class()
+    public function classroom()
     {
         return $this->belongsTo(ClassRoom::class, 'class_id');
     }

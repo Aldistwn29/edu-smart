@@ -1,3 +1,13 @@
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/Components/ui/alert-dialog';
 import { Button } from '@/Components/ui/button';
 import {
     Card,
@@ -19,17 +29,22 @@ import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { BookOpen, Copy, PlusCircle, User } from 'lucide-react';
+import { BookOpen, Copy, PlusCircle, Trash2, User } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 export default function Index({ classrooms }) {
     const [open, setOpen] = useState(false);
+    const [selectedClassroom, setSelectedClassroom] = useState(null);
+
     const { data, setData, post, processing, reset, errors } = useForm({
         name: '',
         subject: '',
         academic_year: '2025/2026',
         description: '',
     });
+
+    const { delete: destroy, processing: deleting } = useForm();
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -42,9 +57,36 @@ export default function Index({ classrooms }) {
         });
     };
 
+    const handleDelete = () => {
+        if (!selectedClassroom) return;
+
+        destroy(
+            route('guru.classroom.destroy', {
+                classRoom: selectedClassroom.id,
+            }),
+            {
+                onSuccess: () => {
+                    toast.success(
+                        `Kelas ${selectedClassroom.name} berhasil dihapus`,
+                    );
+                    setSelectedClassroom(null);
+                },
+                onError: (errors) => {
+                    console.error('Delete error:', errors);
+                    toast.error('Gagal menghapus kelas. Silakan coba lagi.');
+                },
+                onFinish: () => {
+                    // Jangan tutup otomatis jika ada error supaya user bisa lihat,
+                    // tapi di sini kita tutup demi UX yang bersih jika terpancing onSuccess
+                },
+                preserveScroll: true,
+            },
+        );
+    };
+
     const copyCode = (code) => {
         navigator.clipboard.writeText(code);
-        toast.success('Kode berhasil disalin' + code);
+        toast.success('Kode berhasil disalin: ' + code);
     };
 
     return (
@@ -201,25 +243,38 @@ export default function Index({ classrooms }) {
                             className="group relative overflow-hidden border-border/50 bg-card/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/10"
                         >
                             {/* Decorative background element */}
-                            <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-primary/5 blur-3xl transition-colors group-hover:bg-primary/10" />
+                            <div className="pointer-events-none absolute -right-4 -top-4 h-24 w-24 rounded-full bg-primary/5 blur-3xl transition-colors group-hover:bg-primary/10" />
 
                             <CardHeader className="pb-4">
                                 <div className="mb-4 flex items-start justify-between">
                                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-inner transition-transform duration-500 group-hover:rotate-12">
                                         <BookOpen className="h-6 w-6" />
                                     </div>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => copyCode(cls.code)}
-                                        className="h-8 select-none gap-2 rounded-xl bg-muted/50 px-3 text-xs font-bold transition-all hover:bg-primary hover:text-primary-foreground active:scale-95"
-                                        title="Klik untuk salin kode kelas"
-                                    >
-                                        <span className="font-mono tracking-wider">
-                                            {cls.code}
-                                        </span>
-                                        <Copy className="h-3.5 w-3.5 opacity-60" />
-                                    </Button>
+                                    <div className="flex gap-2">
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => copyCode(cls.code)}
+                                            className="h-8 select-none gap-2 rounded-xl bg-muted/50 px-3 text-xs font-bold transition-all hover:bg-primary hover:text-primary-foreground active:scale-95"
+                                            title="Klik untuk salin kode kelas"
+                                        >
+                                            <span className="font-mono tracking-wider">
+                                                {cls.code}
+                                            </span>
+                                            <Copy className="h-3.5 w-3.5 opacity-60" />
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() =>
+                                                setSelectedClassroom(cls)
+                                            }
+                                            className="h-8 w-8 rounded-xl text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                                            title="Hapus Kelas"
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    </div>
                                 </div>
                                 <div className="space-y-1">
                                     <CardTitle className="line-clamp-1 text-xl font-bold tracking-tight transition-colors group-hover:text-primary">
@@ -232,10 +287,8 @@ export default function Index({ classrooms }) {
                                         <span className="h-1 w-1 rounded-full bg-muted-foreground/30" />
                                         <span>{cls.academic_year}</span>
                                     </CardDescription>
-                                    <CardDescription className="flex items-center gap-2 font-medium">
-                                        <span className="text-muted-foreground">
-                                            {cls.description}
-                                        </span>
+                                    <CardDescription className="line-clamp-1 font-medium text-muted-foreground">
+                                        {cls.description}
                                     </CardDescription>
                                 </div>
                             </CardHeader>
@@ -262,10 +315,10 @@ export default function Index({ classrooms }) {
                                         </div>
                                         <div className="flex flex-col">
                                             <span className="text-xs font-medium text-muted-foreground">
-                                                Aktif
+                                                Status
                                             </span>
                                             <span className="text-sm font-bold">
-                                                Baru
+                                                Aktif
                                             </span>
                                         </div>
                                     </div>
@@ -286,6 +339,48 @@ export default function Index({ classrooms }) {
                     ))}
                 </div>
             )}
+
+            {/* Delete Confirmation Dialog */}
+            <AlertDialog
+                open={!!selectedClassroom}
+                onOpenChange={(open) => !open && setSelectedClassroom(null)}
+            >
+                <AlertDialogContent className="rounded-3xl border-none">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="text-2xl font-bold tracking-tight">
+                            Hapus Kelas?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="text-base font-medium">
+                            Anda akan menghapus kelas{' '}
+                            <span className="font-bold text-foreground">
+                                {selectedClassroom?.name}
+                            </span>
+                            . Tindakan ini akan menghapus semua data materi,
+                            tugas, dan quiz di dalamnya secara permanen.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter className="mt-4 gap-3">
+                        <AlertDialogCancel
+                            disabled={deleting}
+                            className="h-12 rounded-2xl border-2 px-6 font-bold"
+                        >
+                            Batalkan
+                        </AlertDialogCancel>
+                        <AlertDialogAction asChild>
+                            <Button
+                                onClick={(e) => {
+                                    e.preventDefault(); // Mencegah dialog tertutup instan
+                                    handleDelete();
+                                }}
+                                disabled={deleting}
+                                className="h-12 rounded-2xl bg-destructive px-6 font-bold text-white hover:bg-destructive/90"
+                            >
+                                {deleting ? 'Menghapus...' : 'Ya, Hapus Kelas'}
+                            </Button>
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </DashboardLayout>
     );
 }

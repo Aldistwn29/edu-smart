@@ -54,6 +54,22 @@ class ClassRoomController extends Controller
             ->with('success', "Berhasil bergabung ke kelas {$classroom->name}");
     }
 
+    public function leave(ClassRoom $classroom)
+    {
+        $user = Auth::user();
+
+        // Cek apakah siswa terdaftar di kelas tersebut
+        if (! $classroom->students()->where('user_id', $user->id)->exists()) {
+            return back()->with('error', 'Anda tidak terdaftar di kelas ini.');
+        }
+
+        // Keluar dari kelas (detach relationship)
+        $classroom->students()->detach($user->id);
+
+        return redirect()->route('siswa.classroom.index')
+            ->with('success', "Berhasil keluar dari kelas {$classroom->name}");
+    }
+
     public function show(ClassRoom $classroom)
     {
         $user = Auth::user();

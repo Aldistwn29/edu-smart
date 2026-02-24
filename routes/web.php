@@ -37,6 +37,7 @@ Route::middleware(['role:guru'])->prefix('guru')->name('guru.')->group(function 
     Route::get('/classrooms', [ClassRoomController::class, 'index'])->name('classroom.index');
     Route::post('/classrooms', [ClassRoomController::class, 'store'])->name('classroom.store');
     Route::get('/classrooms/{classRoom}', [ClassRoomController::class, 'show'])->name('classroom.show');
+    Route::delete('/classrooms/{classRoom}/delete', [ClassRoomController::class, 'destroy'])->name('classroom.destroy');
 });
 
 // Siswa
@@ -47,5 +48,6 @@ Route::middleware(['role:siswa'])->prefix('siswa')->name('siswa.')->group(functi
     Route::get('/classrooms', [SiswaClassRoomController::class, 'index'])->name('classroom.index');
     Route::post('/classrooms', [SiswaClassRoomController::class, 'join'])->name('classroom.join');
     Route::get('/classrooms/{classroom}', [SiswaClassRoomController::class, 'show'])->name('classroom.show');
+    Route::delete('/classrooms/{classroom}/leave', [SiswaClassRoomController::class, 'leave'])->name('classroom.leave');
 });
 require __DIR__.'/auth.php';

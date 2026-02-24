@@ -1,6 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
+import { Calendar } from '@/Components/ui/calendar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Progress } from '@/Components/ui/progress';
 import { Tabs, TabsList, TabsTrigger } from '@/Components/ui/tabs';
@@ -10,9 +11,10 @@ import { TabsContent } from '@radix-ui/react-tabs';
 import {
     ArrowRight,
     BookOpen,
-    Calendar,
+    CalendarIcon,
     CheckCircle2,
     ChevronLeft,
+    Clock,
     Trophy,
     User,
 } from 'lucide-react';
@@ -26,6 +28,8 @@ export default function Show({
     totalCount = 0,
 }) {
     const [activeTab, setActiveTab] = useState('all');
+
+    const [date, setDate] = useState(new Date());
 
     const filteredMaterials =
         activeTab === 'all'
@@ -288,24 +292,60 @@ export default function Show({
                         </Card>
 
                         {/* Jadwal Kelas */}
-                        <Card className="rounded-3xl border-none bg-card shadow-sm ring-1 ring-border/50">
+                        <Card className="overflow-hidden rounded-[2.5rem] border-none bg-card shadow-sm ring-1 ring-border/50">
                             <CardHeader className="pb-4">
                                 <CardTitle className="flex items-center gap-4 text-xl font-bold">
                                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                                        <Calendar className="h-6 w-6" />
+                                        <CalendarIcon className="h-6 w-6" />
                                     </div>
                                     Jadwal Kelas
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent className="space-y-6 pt-2">
-                                <div className="relative space-y-1 border-l-2 border-primary/20 pb-4 pl-8">
-                                    <div className="absolute -left-[7px] top-1.5 h-3 w-3 rounded-full bg-primary ring-4 ring-card" />
-                                    <p className="text-base font-bold text-foreground">
-                                        {classroom?.academic_year || 'Senin'}
-                                    </p>
-                                    <p className="text-sm text-muted-foreground">
-                                        08.00 - 10.00 • Video Konferensi
-                                    </p>
+                            <CardContent className="p-0">
+                                <div className="flex justify-center border-b p-3">
+                                    <Calendar
+                                        mode="single"
+                                        selected={date}
+                                        onSelect={setDate}
+                                        className="rounded-md border-none"
+                                    />
+                                </div>
+
+                                <div className="space-y-6 p-6">
+                                    <div className="flex items-start gap-4">
+                                        <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-100 text-orange-600">
+                                            <Clock className="h-5 w-5" />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <p className="font-bold text-foreground">
+                                                Sesi Video Konferensi
+                                            </p>
+                                            <p className="text-sm font-medium text-muted-foreground">
+                                                Senin • 08.00 - 10.00 WIB
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-start gap-4">
+                                        <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
+                                            <BookOpen className="h-5 w-5" />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <p className="font-bold text-foreground">
+                                                Diskusi Kelompok
+                                            </p>
+                                            <p className="text-sm font-medium text-muted-foreground">
+                                                Rabu • 13.00 - 15.00 WIB
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <Button
+                                        variant="outline"
+                                        className="h-11 w-full rounded-2xl border-2 font-bold transition-all hover:border-primary hover:bg-primary hover:text-primary-foreground"
+                                    >
+                                        Lihat Semua Jadwal
+                                    </Button>
                                 </div>
                             </CardContent>
                         </Card>

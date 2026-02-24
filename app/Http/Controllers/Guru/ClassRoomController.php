@@ -48,7 +48,7 @@ class ClassRoomController extends Controller
         $classRoom->loadCount(['students', 'materials', 'quizzes'])->load([
             'students' => function ($query) {
                 $query->select('users.id', 'users.name', 'users.email')->orderBy('name', 'asc');
-            }
+            },
         ]);
 
         // Fetch materials with human-friendly dates
@@ -57,6 +57,7 @@ class ClassRoomController extends Controller
             ->get()
             ->map(function ($material) {
                 $material->created_at_human = $material->created_at->diffForHumans();
+
                 return $material;
             });
 
@@ -71,5 +72,18 @@ class ClassRoomController extends Controller
             'materials' => $materials,
             'quizzes' => $quizzes,
         ]);
+    }
+
+    public function destroy(ClassRoom $classRoom)
+    {
+        // Hanya guru pemilik kelas yang bisa menghapus
+        if ($classRoom->teacher_id != Auth::id()) {
+            abort(403);
+        }
+
+        $classRoom->delete();
+
+        return redirect()->route('guru.classroom.index')
+            ->with('success', "Kelas {$classRoom->name} berhasil dihapus");
     }
 }
