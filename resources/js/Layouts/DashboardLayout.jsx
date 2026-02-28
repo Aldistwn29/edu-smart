@@ -40,7 +40,11 @@ export default function DashbordLayout({ children }) {
                       href: route('guru.classroom.index'),
                   },
                   { icon: BookOpen, label: 'Mata Pelajaran', href: '#' },
-                  { icon: ClipboardList, label: 'Quiz', href: '#' },
+                  {
+                      icon: ClipboardList,
+                      label: 'Quiz',
+                      href: route('guru.quizes.index'),
+                  },
                   { icon: Notebook, label: 'Assignment Tugas', href: '#' },
                   { icon: Settings, label: 'Pengaturan', href: '#' },
               ]

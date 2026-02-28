@@ -22,7 +22,7 @@ class Quize extends Model
 
     public function attempts()
     {
-        return $this->hasMany(QuizAttempt::class);
+        return $this->hasMany(QuizAttempt::class, 'quiz_id');
     }
 
     public function classroom()

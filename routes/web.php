@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Guru\ClassRoomController;
 use App\Http\Controllers\Guru\GuruDashboardController;
+use App\Http\Controllers\Guru\QuizController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Siswa\ClassRoomController as SiswaClassRoomController;
 use App\Http\Controllers\Siswa\SiswaDashboardController;
@@ -38,6 +39,10 @@ Route::middleware(['role:guru'])->prefix('guru')->name('guru.')->group(function 
     Route::post('/classrooms', [ClassRoomController::class, 'store'])->name('classroom.store');
     Route::get('/classrooms/{classRoom}', [ClassRoomController::class, 'show'])->name('classroom.show');
     Route::delete('/classrooms/{classRoom}/delete', [ClassRoomController::class, 'destroy'])->name('classroom.destroy');
+
+    // Quiz
+    Route::get('/quizes', [QuizController::class, 'index'])->name('quizes.index');
+    Route::get('/quizes/create', [QuizController::class, 'create'])->name('quizes.create');
 });
 
 // Siswa
