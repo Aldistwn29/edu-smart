@@ -56,7 +56,7 @@ export default function GuruDashboard({ stats, activities }) {
                         </p>
                     </div>
                     <div className="flex gap-3">
-                        <Link href="#">
+                        <Link href={route('guru.quizes.create')}>
                             <Button variant="outline">
                                 <FileText className="mr-2 h-4 w-4" />
                                 Buat Quiz

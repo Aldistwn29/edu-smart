@@ -5,29 +5,32 @@ import DashbordLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { CheckCircle2, ChevronLeft, Plus, Save, Trash2 } from 'lucide-react';
 
-export default function QuizBuilder({ classrooms }) {
-    const { data, setData, post, processing, errors } = useForm({
-        class_id: '',
-        title: '',
-        description: '',
-        duration_minutes: 60,
-        deadline_date: '',
-        deadline_time: '',
-        deadline: '',
-        questions: [
-            {
-                id: Date.now(),
-                text: '',
-                type: 'multiple_choice',
-                options: [
-                    { option_text: '', is_correct: true },
-                    { option_text: '', is_correct: false },
-                    { option_text: '', is_correct: false },
-                    { option_text: '', is_correct: false },
-                ],
-                points: 10,
-            },
-        ],
+export default function Edit({ classrooms, quiz }) {
+    // Membagi deadline menjadi tanggal dan waktu
+    const deadlineParts = quiz.deadline ? quiz.deadline.split(' ') : ['', ''];
+    const deadlineDate = deadlineParts[0];
+    const deadlineTime = deadlineParts[1]
+        ? deadlineParts[1].substring(0, 5)
+        : '';
+
+    const { data, setData, put, processing, errors } = useForm({
+        class_id: quiz.class_id || '',
+        title: quiz.title || '',
+        description: quiz.description || '',
+        duration_minutes: quiz.duration_minutes || 60,
+        deadline_date: deadlineDate,
+        deadline_time: deadlineTime,
+        questions:
+            quiz.questions.map((q) => ({
+                id: q.id,
+                text: q.question,
+                type: q.type,
+                points: q.points,
+                options:
+                    typeof q.options === 'string'
+                        ? JSON.parse(q.options)
+                        : q.options,
+            })) || [],
     });
 
     const addQuestion = () => {
@@ -63,6 +66,7 @@ export default function QuizBuilder({ classrooms }) {
                               is_correct: i === 0,
                           })),
         };
+
         setData('questions', updated);
     };
 
@@ -73,7 +77,7 @@ export default function QuizBuilder({ classrooms }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        post(route('guru.quizes.store'));
+        put(route('guru.quizes.update', quiz.id));
     };
 
     const totalPoints = data.questions.reduce(
@@ -83,7 +87,7 @@ export default function QuizBuilder({ classrooms }) {
 
     return (
         <DashbordLayout>
-            <Head title="Buat Quiz Baru" />
+            <Head title="Edit Quiz" />
 
             <form onSubmit={handleSubmit} className="space-y-8 pb-20">
                 {/* Header Section */}
@@ -101,17 +105,15 @@ export default function QuizBuilder({ classrooms }) {
 
                 <div className="mt-6">
                     <h1 className="text-3xl font-bold text-slate-900">
-                        Buat Quiz Baru
+                        Edit Quiz
                     </h1>
                     <p className="mt-1 text-muted-foreground">
-                        Ayo mulai bangun generasi bangsa dengan kuis yang
-                        interaktif
+                        Ayo lanjutkan progres untuk membangun generasi bangsa
                     </p>
                 </div>
 
                 {/* Section 1: Quiz Details */}
                 <div className="space-y-6 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-                    {/* Judul Quiz */}
                     <div className="space-y-2">
                         <Label className="text-xs font-black uppercase text-slate-400">
                             Judul Quiz
@@ -129,7 +131,6 @@ export default function QuizBuilder({ classrooms }) {
                         )}
                     </div>
 
-                    {/* Deskripsi */}
                     <div className="space-y-2 border-t border-slate-50 pt-4">
                         <Label className="text-xs font-black uppercase text-slate-400">
                             Deskripsi
@@ -145,7 +146,6 @@ export default function QuizBuilder({ classrooms }) {
                     </div>
 
                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                        {/* Kelas */}
                         <div className="space-y-2">
                             <Label className="text-xs font-black uppercase text-slate-400">
                                 Pilih Kelas
@@ -171,7 +171,6 @@ export default function QuizBuilder({ classrooms }) {
                             )}
                         </div>
 
-                        {/* Durasi */}
                         <div className="space-y-2">
                             <Label className="text-xs font-black uppercase text-slate-400">
                                 Durasi (Menit)
@@ -187,7 +186,6 @@ export default function QuizBuilder({ classrooms }) {
                         </div>
                     </div>
 
-                    {/* Deadline */}
                     <div className="space-y-4 border-t border-slate-50 pt-4">
                         <Label className="text-xs font-black uppercase text-slate-400">
                             Batas Waktu
@@ -215,9 +213,7 @@ export default function QuizBuilder({ classrooms }) {
 
                 {/* Section 2: Question Builder */}
                 <div className="space-y-6">
-                    <h2 className="px-2 text-xl font-bold text-slate-800">
-                        Daftar Soal
-                    </h2>
+                    <h2 className="px-2 text-xl font-bold">Daftar Soal</h2>
                     {data.questions.map((q, index) => (
                         <div
                             key={index}
@@ -274,11 +270,16 @@ export default function QuizBuilder({ classrooms }) {
                                             type="number"
                                             className="w-8 border-none bg-transparent p-0 text-sm font-bold focus:ring-0"
                                             value={q.points}
-                                            onChange={(e) =>
-                                                updateQuestion(index, {
+                                            onChange={(e) => {
+                                                const updated = [
+                                                    ...data.questions,
+                                                ];
+                                                updated[index] = {
+                                                    ...updated[index],
                                                     points: e.target.value,
-                                                })
-                                            }
+                                                };
+                                                setData('questions', updated);
+                                            }}
                                         />
                                     </div>
                                     <Button
@@ -382,7 +383,7 @@ export default function QuizBuilder({ classrooms }) {
                             <Plus className="h-6 w-6" strokeWidth={3} />
                         </div>
                         <span className="text-lg font-bold text-slate-400 transition-colors group-hover:text-primary">
-                            Tambah Pertanyaan Baru
+                            Tambah Pertanyaan
                         </span>
                     </Button>
                 </div>
@@ -419,7 +420,7 @@ export default function QuizBuilder({ classrooms }) {
                             className="w-full rounded-2xl shadow-lg shadow-primary/20 lg:h-14 lg:w-auto lg:px-12"
                         >
                             <Save className="mr-2 h-5 w-5" />
-                            <span className="font-bold">Buat Quiz Baru</span>
+                            <span className="font-bold">Simpan Perubahan</span>
                         </Button>
                     </div>
                 </div>

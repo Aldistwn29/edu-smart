@@ -43,6 +43,10 @@ Route::middleware(['role:guru'])->prefix('guru')->name('guru.')->group(function 
     // Quiz
     Route::get('/quizes', [QuizController::class, 'index'])->name('quizes.index');
     Route::get('/quizes/create', [QuizController::class, 'create'])->name('quizes.create');
+    Route::post('/quizes', [QuizController::class, 'store'])->name('quizes.store');
+    Route::get('/quizes/{quiz}/edit', [QuizController::class, 'edit'])->name('quizes.edit');
+    Route::put('/quizes/{quiz}', [QuizController::class, 'update'])->name('quizes.update');
+    Route::delete('/quizes/{quiz}/delete', [QuizController::class, 'destroy'])->name('quizes.destroy');
 });
 
 // Siswa

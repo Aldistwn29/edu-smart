@@ -1,27 +1,56 @@
-import { Button } from '@/Components/ui/button';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from '@/Components/ui/alert-dialog';
+import { Button, buttonVariants } from '@/Components/ui/button';
 import {
     Pagination,
     PaginationContent,
-    PaginationEllipsis,
     PaginationItem,
     PaginationLink,
     PaginationNext,
     PaginationPrevious,
 } from '@/Components/ui/pagination';
 import DashbordLayout from '@/Layouts/DashboardLayout';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import {
     BarChart3,
     BookOpen,
     Clock,
     LayoutList,
+    Pencil,
     Trash,
     User,
 } from 'lucide-react';
+import { toast } from 'sonner';
 export default function Index({ stats, quizzes }) {
-    const getProgressWidth = (completed, total) => {
+    const calculatedProgress = (completed, total) => {
         if (total === 0) return 0;
         return (completed / total) * 100;
+    };
+
+    const handleDelete = (id) => {
+        router.delete(route('guru.quizes.destroy', id), {
+            onStart: () => {},
+            onSuccess: () => {
+                toast.success('Quiz berhasil dihapus');
+            },
+            onError: () => {
+                toast.error('Quiz gagal dihapus', {
+                    description: 'Terjadi kesalahan saat menghapus quiz',
+                });
+            },
+            onFinish: () => {
+                toast.dismiss();
+            },
+        });
     };
     return (
         <DashbordLayout>
@@ -128,57 +157,122 @@ export default function Index({ stats, quizzes }) {
                                     key={id}
                                     className="space-y-4 rounded-3xl border border-slate-200 p-6 transition-colors hover:border-slate-300"
                                 >
-                                    <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                                        <div className="space-y-1">
-                                            <div className="flex items-center gap-2">
-                                                <span className="rounded-full border border-slate-300 px-2 py-1 text-[10px] font-bold uppercase text-slate-400 sm:text-xs">
-                                                    Quiz
-                                                </span>
-                                                <h3 className="line-clamp-1 text-base font-bold text-slate-800">
-                                                    {quiz.title}
-                                                </h3>
-                                            </div>
-                                            <p className="line-clamp-2 max-w-2xl text-xs font-medium leading-relaxed text-slate-500 sm:text-sm">
-                                                {quiz.description}
-                                            </p>
+                                    <div className="space-y-2">
+                                        <div className="flex items-center gap-2">
+                                            <span className="rounded-full bg-primary/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-primary sm:text-xs">
+                                                {quiz.classroom_name}
+                                            </span>
+                                            <h3 className="line-clamp-1 text-base font-bold text-slate-800">
+                                                {quiz.title}
+                                            </h3>
                                         </div>
-                                        {/* Info kanan : waktu, status, hapus */}
-                                        <div className="flex w-full items-center justify-between gap-4 md:w-auto md:justify-end">
-                                            <div className="flex items-center text-xs font-bold text-slate-400 sm:text-sm">
-                                                <Clock className="h-4 w-4 sm:h-5 sm:w-5" />
-                                                <span className="ml-1 sm:ml-2">
-                                                    {quiz.remaining_days} hari
-                                                    lagi
-                                                </span>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <span className="rounded-full bg-emerald-500 px-3 py-1 text-[10px] font-bold text-emerald-700 sm:text-xs">
+                                        <p className="line-clamp-2 max-w-2xl text-xs font-medium leading-relaxed text-slate-500 sm:text-sm">
+                                            {quiz.description}
+                                        </p>
+                                    </div>
+                                    {/* Info kanan : waktu, status, hapus */}
+                                    <div className="flex w-full items-center justify-between gap-4 md:w-auto md:justify-end">
+                                        <div className="flex items-center text-xs font-bold text-slate-400 sm:text-sm">
+                                            <Clock className="h-4 w-4 sm:h-5 sm:w-5" />
+                                            <span className="ml-1 sm:ml-2">
+                                                {quiz.is_active
+                                                    ? `${quiz.remaining_days} hari lagi`
+                                                    : 'Batas waktu sudah lewat'}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            {quiz.is_active ? (
+                                                <span className="rounded-full bg-emerald-50 px-3 py-1 text-[10px] font-bold text-emerald-600 sm:text-xs">
                                                     Aktif
                                                 </span>
-                                                <Button
-                                                    size="icon"
-                                                    className="h-8 w-8 rounded-xl sm:h-9 sm:w-9"
-                                                >
-                                                    <Trash className="h-3 w-3 sm:h-4 sm:w-4" />
-                                                </Button>
-                                            </div>
+                                            ) : (
+                                                <span className="rounded-full bg-rose-50 px-3 py-1 text-[10px] font-bold text-rose-600 sm:text-xs">
+                                                    Berakhir
+                                                </span>
+                                            )}
                                         </div>
                                     </div>
 
                                     {/* Bar Progress */}
-                                    <div className="space-y-2">
-                                        <div className="flex justify-end text-xs font-bold text-slate-500">
-                                            {quiz.completed_count} /{' '}
-                                            {quiz.total_students} selesai
+                                    <div className="space-y-3">
+                                        <div className="flex items-center justify-between text-xs font-bold sm:text-sm">
+                                            <span className="uppercase tracking-tighter text-slate-400">
+                                                Progres Pengerjaan
+                                            </span>
+                                            <span className="text-slate-700">
+                                                {quiz.completed_count} /{' '}
+                                                {quiz.total_students} Selesai
+                                            </span>
                                         </div>
-                                        <div className="w-full bg-cyan-400 transition-all duration-300">
+                                        <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
                                             <div
-                                                className="h-full bg-cyan-400 transition-all duration-500"
+                                                className="h-full bg-gradient-to-r from-primary/80 to-primary transition-all duration-500"
                                                 style={{
                                                     width: `${calculatedProgress(quiz.completed_count, quiz.total_students)}%`,
                                                 }}
                                             ></div>
                                         </div>
+                                    </div>
+
+                                    {/* Footer: Tombol Aksi */}
+                                    <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:justify-end">
+                                        {/* Tombol Edit */}
+                                        <Link
+                                            href={route(
+                                                'guru.quizes.edit',
+                                                quiz.id,
+                                            )}
+                                            className={buttonVariants({
+                                                variant: 'outline',
+                                                size: 'sm',
+                                                className:
+                                                    'w-full rounded-xl sm:w-32',
+                                            })}
+                                        >
+                                            <Pencil className="mr-2 h-4 w-4" />
+                                            Edit
+                                        </Link>
+
+                                        {/* Tombol Hapus */}
+                                        <AlertDialog>
+                                            <AlertDialogTrigger asChild>
+                                                <Button
+                                                    variant="destructive"
+                                                    size="sm"
+                                                    className="w-full rounded-xl sm:w-32"
+                                                >
+                                                    <Trash className="mr-2 h-4 w-4" />
+                                                    Hapus
+                                                </Button>
+                                            </AlertDialogTrigger>
+                                            <AlertDialogContent className="rounded-2xl border-none shadow-2xl">
+                                                <AlertDialogHeader>
+                                                    <AlertDialogTitle className="text-xl font-semibold text-slate-900">
+                                                        Hapus Kuis?
+                                                    </AlertDialogTitle>
+                                                    <AlertDialogDescription className="text-slate-500">
+                                                        Tindakan ini tidak dapat
+                                                        dibatalkan. semua data
+                                                        siswa akan hilang
+                                                    </AlertDialogDescription>
+                                                </AlertDialogHeader>
+                                                <AlertDialogFooter className="gap-2">
+                                                    <AlertDialogCancel className="rounded-xl border-slate-200 font-semibold hover:bg-slate-50">
+                                                        Batal
+                                                    </AlertDialogCancel>
+                                                    <AlertDialogAction
+                                                        onClick={() =>
+                                                            handleDelete(
+                                                                quiz.id,
+                                                            )
+                                                        }
+                                                        className="rounded-xl bg-rose-500 text-white hover:bg-rose-600"
+                                                    >
+                                                        Ya, Hapus Sekarang
+                                                    </AlertDialogAction>
+                                                </AlertDialogFooter>
+                                            </AlertDialogContent>
+                                        </AlertDialog>
                                     </div>
                                 </div>
                             ))
@@ -191,56 +285,43 @@ export default function Index({ stats, quizzes }) {
                     <div className="pt-8">
                         <Pagination>
                             <PaginationContent>
-                                {/* Tombol sebelumnya */}
-                                <PaginationItem>
-                                    <PaginationPrevious
-                                        href={quizzes.links.prev}
-                                        className="cursor-pointer rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900"
-                                    />
-                                </PaginationItem>
-
-                                {/* Halaman aktif 1 */}
-                                <PaginationItem>
-                                    <PaginationLink
-                                        href={quizzes.links.first}
-                                        className="rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-                                    >
-                                        1
-                                    </PaginationLink>
-                                </PaginationItem>
-
-                                {/* Halaman aktif 2 */}
-                                <PaginationItem>
-                                    <PaginationLink
-                                        href={quizzes.links.second}
-                                        className="rounded-xl border-slate-900 bg-slate-900 text-white hover:bg-slate-800"
-                                    >
-                                        2
-                                    </PaginationLink>
-                                </PaginationItem>
-
-                                {/* Halaman aktif 3 */}
-                                <PaginationItem>
-                                    <PaginationLink
-                                        href={quizzes.links.last}
-                                        className="rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-                                    >
-                                        3
-                                    </PaginationLink>
-                                </PaginationItem>
-
-                                {/* Titik-titik jika halaman sangat banyak */}
-                                <PaginationItem>
-                                    <PaginationEllipsis />
-                                </PaginationItem>
-
-                                {/* Tombol selanjutnya */}
-                                <PaginationItem>
-                                    <PaginationNext
-                                        href={quizzes.links.next}
-                                        className="cursor-pointer rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900"
-                                    />
-                                </PaginationItem>
+                                {quizzes.links.map((link, index) => (
+                                    <PaginationItem key={index}>
+                                        {link.label.includes('Previous') ? (
+                                            <PaginationPrevious
+                                                href={link.url}
+                                                className={
+                                                    !link.url
+                                                        ? 'pointer-events-none opacity-50'
+                                                        : 'cursor-pointer'
+                                                }
+                                            />
+                                        ) : link.label.includes('Next') ? (
+                                            <PaginationNext
+                                                href={link.url}
+                                                className={
+                                                    !link.url
+                                                        ? 'pointer-events-none opacity-50'
+                                                        : 'cursor-pointer'
+                                                }
+                                            />
+                                        ) : (
+                                            <PaginationLink
+                                                href={link.url}
+                                                isActive={link.active}
+                                                className={
+                                                    link.active
+                                                        ? 'bg-primary text-white hover:bg-primary/90'
+                                                        : ''
+                                                }
+                                            >
+                                                {link.label
+                                                    .replace('&laquo; ', '')
+                                                    .replace(' &raquo;', '')}
+                                            </PaginationLink>
+                                        )}
+                                    </PaginationItem>
+                                ))}
                             </PaginationContent>
                         </Pagination>
                     </div>
