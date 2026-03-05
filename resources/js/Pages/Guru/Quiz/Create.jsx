@@ -4,6 +4,7 @@ import { Label } from '@/Components/ui/label';
 import DashbordLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { CheckCircle2, ChevronLeft, Plus, Save, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function QuizBuilder({ classrooms }) {
     const { data, setData, post, processing, errors } = useForm({
@@ -73,7 +74,20 @@ export default function QuizBuilder({ classrooms }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        post(route('guru.quizes.store'));
+        toast.loading('Menyimpan quiz...');
+        post(route('guru.quizes.store'), {
+            onSuccess: () => {
+                toast.success('Quiz berhasil disimpan');
+            },
+            onError: () => {
+                toast.error('Quiz gagal disimpan', {
+                    description: 'Terjadi kesalahan saat menyimpan quiz',
+                });
+            },
+            onFinish: () => {
+                toast.dismiss();
+            },
+        });
     };
 
     const totalPoints = data.questions.reduce(

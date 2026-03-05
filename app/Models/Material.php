@@ -12,13 +12,21 @@ class Material extends Model
         'title',
         'description',
         'type',
+        'content',
         'file_path',
         'order',
     ];
 
-    public function class()
+    protected $appends = ['file_path_url'];
+
+    public function getFilePathUrlAttribute()
     {
-        return $this->belongsTo(ClassRoom::class);
+        return $this->file_path ? asset('storage/'.$this->file_path) : null;
+    }
+
+    public function classroom()
+    {
+        return $this->belongsTo(ClassRoom::class, 'class_id');
     }
 
     public function progress()

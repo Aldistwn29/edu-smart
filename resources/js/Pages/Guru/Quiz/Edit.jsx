@@ -4,6 +4,7 @@ import { Label } from '@/Components/ui/label';
 import DashbordLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { CheckCircle2, ChevronLeft, Plus, Save, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function Edit({ classrooms, quiz }) {
     // Membagi deadline menjadi tanggal dan waktu
@@ -76,8 +77,21 @@ export default function Edit({ classrooms, quiz }) {
     };
 
     const handleSubmit = (e) => {
+        toast.loading('Menyimpan quiz...');
         e.preventDefault();
-        put(route('guru.quizes.update', quiz.id));
+        put(route('guru.quizes.update', quiz.id), {
+            onSuccess: () => {
+                toast.success('Quiz berhasil disimpan');
+            },
+            onError: () => {
+                toast.error('Quiz gagal disimpan', {
+                    description: 'Terjadi kesalahan saat menyimpan quiz',
+                });
+            },
+            onFinish: () => {
+                toast.dismiss();
+            },
+        });
     };
 
     const totalPoints = data.questions.reduce(

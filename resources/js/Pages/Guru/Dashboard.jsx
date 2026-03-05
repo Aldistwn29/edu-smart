@@ -62,7 +62,7 @@ export default function GuruDashboard({ stats, activities }) {
                                 Buat Quiz
                             </Button>
                         </Link>
-                        <Link href="#">
+                        <Link href={route('guru.materies.create')}>
                             <Button variant="default">
                                 <Plus className="mr-2 h-4 w-4" />
                                 Tambah Materi

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Guru;
 use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\ClassRoom;
+use App\Models\Material;
 use App\Models\QuizAttempt;
 use App\Models\Quize;
 use App\Models\User;
@@ -20,11 +21,12 @@ class GuruDashboardController extends Controller
         // Data statistika utama
         $totalStudents = ClassRoom::where('teacher_id', $teacher_id)
             ->withCount('students')->get()->sum('students_count');
+
         $newStudentsThisMonth = User::where('role', 'siswa')
-            ->whereHas('teachingClasses', function ($q) use ($teacher_id) {
-                $q->where('teacher_id', $teacher_id);
+            ->whereHas('enrolledClasses', function ($q) use ($teacher_id) {
+                $q->where('teacher_id', $teacher_id)
+                  ->where('classroom_user.created_at', '>=', now()->startOfMonth());
             })
-            ->where('created_at', '>=', now()->startOfMonth())
             ->count();
 
         $stats = [
@@ -33,8 +35,8 @@ class GuruDashboardController extends Controller
                 'change' => "+ $newStudentsThisMonth Bulan ini",
             ],
             'total_subject' => [
-                'value' => ClassRoom::where('teacher_id', $teacher_id)->count(),
-                'change' => 'Total Matakuliah',
+                'value' => Material::where('teacher_id', $teacher_id)->count(),
+                'change' => 'Total Materi',
             ],
             'total_quizzes' => [
                 'value' => Quize::where('teacher_id', $teacher_id)->count(),
@@ -48,7 +50,7 @@ class GuruDashboardController extends Controller
             ],
         ];
 
-        // Ambil aktifitas terbaru
+        // Ambil aktifitas terbaru (dari semua guru jika ingin global, atau spesifik guru)
         $activities = ActivityLog::where('user_id', $teacher_id)
             ->latest()
             ->take(5)

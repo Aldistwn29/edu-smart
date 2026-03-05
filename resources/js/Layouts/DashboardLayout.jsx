@@ -39,14 +39,17 @@ export default function DashbordLayout({ children }) {
                       label: 'Kelas',
                       href: route('guru.classroom.index'),
                   },
-                  { icon: BookOpen, label: 'Mata Pelajaran', href: '#' },
+                  {
+                      icon: BookOpen,
+                      label: 'Mata Pelajaran',
+                      href: route('guru.materies.index'),
+                  },
                   {
                       icon: ClipboardList,
                       label: 'Quiz',
                       href: route('guru.quizes.index'),
                   },
                   { icon: Notebook, label: 'Assignment Tugas', href: '#' },
-                  { icon: Settings, label: 'Pengaturan', href: '#' },
               ]
             : [
                   {

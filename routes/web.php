@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Guru\ClassRoomController;
 use App\Http\Controllers\Guru\GuruDashboardController;
+use App\Http\Controllers\Guru\MateriController;
 use App\Http\Controllers\Guru\QuizController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Siswa\ClassRoomController as SiswaClassRoomController;
@@ -47,6 +48,14 @@ Route::middleware(['role:guru'])->prefix('guru')->name('guru.')->group(function 
     Route::get('/quizes/{quiz}/edit', [QuizController::class, 'edit'])->name('quizes.edit');
     Route::put('/quizes/{quiz}', [QuizController::class, 'update'])->name('quizes.update');
     Route::delete('/quizes/{quiz}/delete', [QuizController::class, 'destroy'])->name('quizes.destroy');
+
+    // Materi
+    Route::get('/materies', [MateriController::class, 'index'])->name('materies.index');
+    Route::get('/materies/create', [MateriController::class, 'create'])->name('materies.create');
+    Route::post('/materies', [MateriController::class, 'store'])->name('materies.store');
+    Route::get('/materies/{materi}/edit', [MateriController::class, 'edit'])->name('materies.edit');
+    Route::put('/materies/{materi}', [MateriController::class, 'update'])->name('materies.update');
+    Route::delete('/materies/{materi}/delete', [MateriController::class, 'destroy'])->name('materies.destroy');
 });
 
 // Siswa

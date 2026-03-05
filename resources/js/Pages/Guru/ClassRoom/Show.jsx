@@ -22,7 +22,6 @@ import {
     Download,
     FileText,
     MoreVertical,
-    Plus,
     Search,
     Trash2,
     Users,
@@ -228,32 +227,6 @@ export default function Show({ classroom, materials, quizzes = [] }) {
                                         Quiz
                                     </TabsTrigger>
                                 </TabsList>
-
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button className="h-14 items-center gap-2 rounded-2xl px-6 font-bold shadow-xl shadow-primary/20 transition-all hover:scale-105 active:scale-95">
-                                            <Plus className="h-5 w-5" />
-                                            Buat Baru
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent
-                                        align="end"
-                                        className="w-56 rounded-2xl p-2"
-                                    >
-                                        <Link href="#" className="w-full">
-                                            <DropdownMenuItem className="cursor-pointer gap-2 rounded-xl py-3">
-                                                <FileText className="h-4 w-4 text-primary" />
-                                                Buat Materi
-                                            </DropdownMenuItem>
-                                        </Link>
-                                        <Link href="#" className="w-full">
-                                            <DropdownMenuItem className="cursor-pointer gap-2 rounded-xl py-3">
-                                                <ClipboardList className="h-4 w-4 text-primary" />
-                                                Buat Quiz
-                                            </DropdownMenuItem>
-                                        </Link>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
                             </div>
 
                             <TabsContent value="materials" className="mt-0">

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Guru;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\ClassRoom;
 use App\Models\QuizAttempt;
 use App\Models\Quize;
@@ -122,6 +123,15 @@ class QuizController extends Controller
             ]);
         }
 
+        ActivityLog::create([
+            'user_id' => Auth::id(),
+            'action_type' => 'create',
+            'description' => 'Membuat kuis baru: '.$quiz->title,
+            'subject_name' => $quiz->classroom->name,
+            'loggable_id' => $quiz->id,
+            'loggable_type' => Quize::class,
+        ]);
+
         return redirect()->route('guru.quizes.index')->with('success', 'Quiz berhasil dibuat');
     }
 
@@ -183,11 +193,29 @@ class QuizController extends Controller
             ]);
         }
 
+        ActivityLog::create([
+            'user_id' => Auth::id(),
+            'action_type' => 'update',
+            'description' => 'Memperbarui kuis: '.$quiz->title,
+            'subject_name' => $quiz->classroom->name,
+            'loggable_id' => $quiz->id,
+            'loggable_type' => Quize::class,
+        ]);
+
         return redirect()->route('guru.quizes.index')->with('success', 'Quiz berhasil diupdate');
     }
 
     public function destroy(Quize $quiz)
     {
+        ActivityLog::create([
+            'user_id' => Auth::id(),
+            'action_type' => 'delete',
+            'description' => 'Menghapus kuis: '.$quiz->title,
+            'subject_name' => $quiz->classroom->name,
+            'loggable_id' => $quiz->id,
+            'loggable_type' => Quize::class,
+        ]);
+
         $quiz->delete();
 
         return redirect()->route('guru.quizes.index')->with('success', 'Quiz berhasil dihapus');
