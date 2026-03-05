@@ -34,7 +34,7 @@ export default function Create({ classrooms }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        toast.loading('Menyimpan materi...');
+
         post(route('guru.materies.store'), {
             forceFormData: true,
             onSuccess: () => {

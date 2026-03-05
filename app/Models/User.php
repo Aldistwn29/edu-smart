@@ -73,6 +73,13 @@ class User extends Authenticatable
         return $this->hasMany(Material::class, 'teacher_id');
     }
 
-    // relasi ke chatbot
+    public function assigments()
+    {
+        return $this->hasMany(Assigment::class, 'teacher_id');
+    }
 
+    public function submissions()
+    {
+        return $this->hasMany(AssigmentSubmission::class, 'student_id');
+    }
 }

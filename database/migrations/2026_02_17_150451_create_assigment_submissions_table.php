@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('student_id')->constrained('users')->cascadeOnDelete();
 
             $table->text('content')->nullable();
-            $table->string('file_path');
+            $table->string('file_path')->nullable();
             $table->decimal('score', 5, 2);
             $table->text('feedback')->nullable();
             $table->timestamp('graded_at')->nullable();

@@ -49,6 +49,6 @@ class ClassRoom extends Model
 
     public function assigments()
     {
-        return $this->hasMany(Assigment::class);
+        return $this->hasMany(Assigment::class, 'class_id');
     }
 }
