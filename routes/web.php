@@ -7,6 +7,7 @@ use App\Http\Controllers\Guru\MateriController;
 use App\Http\Controllers\Guru\QuizController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Siswa\ClassRoomController as SiswaClassRoomController;
+use App\Http\Controllers\Siswa\QuizController as SiswaQuizController;
 use App\Http\Controllers\Siswa\SiswaDashboardController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -78,5 +79,8 @@ Route::middleware(['role:siswa'])->prefix('siswa')->name('siswa.')->group(functi
     Route::post('/classrooms', [SiswaClassRoomController::class, 'join'])->name('classroom.join');
     Route::get('/classrooms/{classroom}', [SiswaClassRoomController::class, 'show'])->name('classroom.show');
     Route::delete('/classrooms/{classroom}/leave', [SiswaClassRoomController::class, 'leave'])->name('classroom.leave');
+
+    // Quiz
+    Route::get('/quizes', [SiswaQuizController::class, 'index'])->name('quizes.index');
 });
 require __DIR__.'/auth.php';

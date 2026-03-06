@@ -67,7 +67,11 @@ export default function DashbordLayout({ children }) {
                       href: route('siswa.classroom.index'),
                   },
                   { icon: BookOpen, label: 'Mata Pelajaran', href: '#' },
-                  { icon: ClipboardList, label: 'Quiz', href: '#' },
+                  {
+                      icon: ClipboardList,
+                      label: 'Quiz',
+                      href: route('siswa.quizes.index'),
+                  },
                   { icon: Notebook, label: 'Penugasan', href: '#' },
                   { icon: MessageSquare, label: 'Ai Chatbot', href: '#' },
                   { icon: Settings, label: 'Pengaturan', href: '#' },

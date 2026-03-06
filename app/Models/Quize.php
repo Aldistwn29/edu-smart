@@ -15,6 +15,29 @@ class Quize extends Model
         'deadline',
     ];
 
+    protected $appends = ['status', 'is_overdue', 'is_urgent'];
+
+    protected $casts = [
+        'deadline' => 'datetime',
+    ];
+
+    public function getStatusAttribute()
+    {
+        $attempt = $this->attempts()->where('student_id', auth()->id())->first();
+
+        return $attempt ? 'selesai' : 'tersedia';
+    }
+
+    public function getIsOverdueAttribute()
+    {
+        return now()->gt($this->deadline);
+    }
+
+    public function getIsUrgentAttribute()
+    {
+        return now()->lt($this->deadline) && now()->diffInHours($this->deadline) < 24;
+    }
+
     public function questions()
     {
         return $this->hasMany(QuizQuestions::class);
