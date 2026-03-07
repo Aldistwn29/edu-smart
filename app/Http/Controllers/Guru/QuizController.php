@@ -56,7 +56,7 @@ class QuizController extends Controller
                     'classroom_name' => $quiz->classroom ? $quiz->classroom->name : 'N/A',
                     'completed_count' => $quiz->attempts_count,
                     'total_students' => $total_students,
-                    'remaining_days' => Carbon::parse($quiz->deadline)->isPast() ? 0 : Carbon::parse($quiz->deadline)->diffInDays(now()),
+                    'remaining_days' => Carbon::parse($quiz->deadline)->isPast() ? 0 : (int) round(Carbon::parse($quiz->deadline)->diffInDays(now())),
                     'is_active' => Carbon::parse($quiz->deadline)->isFuture(),
                 ];
             });
@@ -203,6 +203,28 @@ class QuizController extends Controller
         ]);
 
         return redirect()->route('guru.quizes.index')->with('success', 'Quiz berhasil diupdate');
+    }
+
+    public function show(Quize $quiz)
+    {
+        $quiz->load(['classroom.students', 'questions']);
+
+        $attempts = QuizAttempt::where('quiz_id', $quiz->id)
+            ->with(['student', 'answers.question'])
+            ->latest()
+            ->get();
+
+        // Map students who haven't attempted yet
+        $submitted_student_ids = $attempts->pluck('student_id')->toArray();
+        $unsubmitted_students = $quiz->classroom->students->filter(function ($student) use ($submitted_student_ids) {
+            return ! in_array($student->id, $submitted_student_ids);
+        });
+
+        return Inertia::render('Guru/Quiz/Show', [
+            'quiz' => $quiz,
+            'attempts' => $attempts,
+            'unsubmitted_students' => $unsubmitted_students->values(),
+        ]);
     }
 
     public function destroy(Quize $quiz)

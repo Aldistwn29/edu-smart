@@ -275,7 +275,12 @@ export default function QuizIndex({ quizzes = { data: [] }, stats }) {
                                                     }`}
                                                 >
                                                     <Link
-                                                        href={`/quiz/${quiz.id}`}
+                                                        href={
+                                                            quiz.status ===
+                                                            'selesai'
+                                                                ? `/siswa/quizzes/${quiz.id}/result`
+                                                                : `/siswa/quizzes/${quiz.id}/take`
+                                                        }
                                                     >
                                                         {quiz.status ===
                                                         'selesai'

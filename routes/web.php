@@ -48,6 +48,7 @@ Route::middleware(['role:guru'])->prefix('guru')->name('guru.')->group(function 
     Route::get('/quizes/create', [QuizController::class, 'create'])->name('quizes.create');
     Route::post('/quizes', [QuizController::class, 'store'])->name('quizes.store');
     Route::get('/quizes/{quiz}/edit', [QuizController::class, 'edit'])->name('quizes.edit');
+    Route::get('/quizes/{quiz}', [QuizController::class, 'show'])->name('quizes.show');
     Route::put('/quizes/{quiz}', [QuizController::class, 'update'])->name('quizes.update');
     Route::delete('/quizes/{quiz}/delete', [QuizController::class, 'destroy'])->name('quizes.destroy');
 
@@ -81,6 +82,9 @@ Route::middleware(['role:siswa'])->prefix('siswa')->name('siswa.')->group(functi
     Route::delete('/classrooms/{classroom}/leave', [SiswaClassRoomController::class, 'leave'])->name('classroom.leave');
 
     // Quiz
-    Route::get('/quizes', [SiswaQuizController::class, 'index'])->name('quizes.index');
+    Route::get('/quizzes', [SiswaQuizController::class, 'index'])->name('quizzes.index');
+    Route::get('/quizzes/{quiz}/take', [SiswaQuizController::class, 'show'])->name('quizzes.show');
+    Route::post('/quizzes/{quiz}/submit', [SiswaQuizController::class, 'submit'])->name('quizzes.submit');
+    Route::get('/quizzes/{quiz}/result', [SiswaQuizController::class, 'result'])->name('quizzes.result');
 });
 require __DIR__.'/auth.php';

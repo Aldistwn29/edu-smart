@@ -155,67 +155,78 @@ export default function Index({ stats, quizzes }) {
                             quizzes.data.map((quiz, id) => (
                                 <div
                                     key={id}
-                                    className="space-y-4 rounded-3xl border border-slate-200 p-6 transition-colors hover:border-slate-300"
+                                    className="group/card relative overflow-hidden rounded-3xl border border-slate-200 transition-all hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5"
                                 >
-                                    <div className="space-y-2">
-                                        <div className="flex items-center gap-2">
-                                            <span className="rounded-full bg-primary/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-primary sm:text-xs">
-                                                {quiz.classroom_name}
-                                            </span>
-                                            <h3 className="line-clamp-1 text-base font-bold text-slate-800">
-                                                {quiz.title}
-                                            </h3>
-                                        </div>
-                                        <p className="line-clamp-2 max-w-2xl text-xs font-medium leading-relaxed text-slate-500 sm:text-sm">
-                                            {quiz.description}
-                                        </p>
-                                    </div>
-                                    {/* Info kanan : waktu, status, hapus */}
-                                    <div className="flex w-full items-center justify-between gap-4 md:w-auto md:justify-end">
-                                        <div className="flex items-center text-xs font-bold text-slate-400 sm:text-sm">
-                                            <Clock className="h-4 w-4 sm:h-5 sm:w-5" />
-                                            <span className="ml-1 sm:ml-2">
-                                                {quiz.is_active
-                                                    ? `${quiz.remaining_days} hari lagi`
-                                                    : 'Batas waktu sudah lewat'}
-                                            </span>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            {quiz.is_active ? (
-                                                <span className="rounded-full bg-emerald-50 px-3 py-1 text-[10px] font-bold text-emerald-600 sm:text-xs">
-                                                    Aktif
-                                                </span>
-                                            ) : (
-                                                <span className="rounded-full bg-rose-50 px-3 py-1 text-[10px] font-bold text-rose-600 sm:text-xs">
-                                                    Berakhir
-                                                </span>
-                                            )}
-                                        </div>
-                                    </div>
+                                    <Link
+                                        href={route(
+                                            'guru.quizes.show',
+                                            quiz.id,
+                                        )}
+                                        className="block p-6 transition-colors hover:bg-slate-50/50"
+                                    >
+                                        <div className="space-y-4">
+                                            <div className="space-y-2">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="rounded-full bg-primary/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-primary sm:text-xs">
+                                                        {quiz.classroom_name}
+                                                    </span>
+                                                    <h3 className="line-clamp-1 text-base font-bold text-slate-800 transition-colors group-hover/card:text-primary">
+                                                        {quiz.title}
+                                                    </h3>
+                                                </div>
+                                                <p className="line-clamp-2 max-w-2xl text-xs font-medium leading-relaxed text-slate-500 sm:text-sm">
+                                                    {quiz.description}
+                                                </p>
+                                            </div>
 
-                                    {/* Bar Progress */}
-                                    <div className="space-y-3">
-                                        <div className="flex items-center justify-between text-xs font-bold sm:text-sm">
-                                            <span className="uppercase tracking-tighter text-slate-400">
-                                                Progres Pengerjaan
-                                            </span>
-                                            <span className="text-slate-700">
-                                                {quiz.completed_count} /{' '}
-                                                {quiz.total_students} Selesai
-                                            </span>
-                                        </div>
-                                        <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
-                                            <div
-                                                className="h-full bg-gradient-to-r from-primary/80 to-primary transition-all duration-500"
-                                                style={{
-                                                    width: `${calculatedProgress(quiz.completed_count, quiz.total_students)}%`,
-                                                }}
-                                            ></div>
-                                        </div>
-                                    </div>
+                                            <div className="flex w-full items-center justify-between gap-4 md:w-auto md:justify-end">
+                                                <div className="flex items-center text-xs font-bold text-slate-400 sm:text-sm">
+                                                    <Clock className="h-4 w-4 sm:h-5 sm:w-5" />
+                                                    <span className="ml-1 sm:ml-2">
+                                                        {quiz.is_active
+                                                            ? `${quiz.remaining_days} hari lagi`
+                                                            : 'Batas waktu sudah lewat'}
+                                                    </span>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    {quiz.is_active ? (
+                                                        <span className="rounded-full bg-emerald-50 px-3 py-1 text-[10px] font-bold text-emerald-600 sm:text-xs">
+                                                            Aktif
+                                                        </span>
+                                                    ) : (
+                                                        <span className="rounded-full bg-rose-50 px-3 py-1 text-[10px] font-bold text-rose-600 sm:text-xs">
+                                                            Berakhir
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
 
-                                    {/* Footer: Tombol Aksi */}
-                                    <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:justify-end">
+                                            {/* Bar Progress */}
+                                            <div className="space-y-3">
+                                                <div className="flex items-center justify-between text-xs font-bold sm:text-sm">
+                                                    <span className="uppercase tracking-tighter text-slate-400">
+                                                        Progres Pengerjaan
+                                                    </span>
+                                                    <span className="text-slate-700">
+                                                        {quiz.completed_count} /{' '}
+                                                        {quiz.total_students}{' '}
+                                                        Selesai
+                                                    </span>
+                                                </div>
+                                                <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                                                    <div
+                                                        className="h-full bg-gradient-to-r from-primary/80 to-primary transition-all duration-500"
+                                                        style={{
+                                                            width: `${calculatedProgress(quiz.completed_count, quiz.total_students)}%`,
+                                                        }}
+                                                    ></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </Link>
+
+                                    {/* Footer: Tombol Aksi - Keep outside of Link to avoid nested links */}
+                                    <div className="flex flex-col gap-3 border-t border-slate-100 bg-slate-50/50 p-6 pt-2 sm:flex-row sm:justify-end">
                                         {/* Tombol Edit */}
                                         <Link
                                             href={route(

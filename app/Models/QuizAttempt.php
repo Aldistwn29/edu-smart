@@ -15,6 +15,20 @@ class QuizAttempt extends Model
         'max_score',
     ];
 
+    protected $casts = [
+        'start_date' => 'datetime',
+        'end_date' => 'datetime',
+    ];
+
+    public function getDurationAttribute()
+    {
+        if (! $this->end_date) {
+            return '-';
+        }
+
+        return $this->start_date->diffForHumans($this->end_date, true);
+    }
+
     public function quiz()
     {
         return $this->belongsTo(Quize::class, 'quiz_id');

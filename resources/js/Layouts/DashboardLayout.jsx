@@ -70,7 +70,7 @@ export default function DashbordLayout({ children }) {
                   {
                       icon: ClipboardList,
                       label: 'Quiz',
-                      href: route('siswa.quizes.index'),
+                      href: route('siswa.quizzes.index'),
                   },
                   { icon: Notebook, label: 'Penugasan', href: '#' },
                   { icon: MessageSquare, label: 'Ai Chatbot', href: '#' },
