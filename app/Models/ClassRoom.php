@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class ClassRoom extends Model
 {
@@ -21,7 +22,7 @@ class ClassRoom extends Model
         parent::boot();
         static::creating(function ($class) {
             if (empty($class->code)) {
-                $class->code = \Illuminate\Support\Str::upper(\Illuminate\Support\Str::random(6));
+                $class->code = Str::upper(Str::random(6));
             }
         });
     }

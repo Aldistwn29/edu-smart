@@ -66,7 +66,7 @@ export default function DashbordLayout({ children }) {
                       label: 'Kelas',
                       href: route('siswa.classroom.index'),
                   },
-                  { icon: BookOpen, label: 'Mata Pelajaran', href: '#' },
+                  { icon: BookOpen, label: 'Mata Pelajaran', href: route('siswa.materies.index') },
                   {
                       icon: ClipboardList,
                       label: 'Quiz',
