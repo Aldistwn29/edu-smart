@@ -28,4 +28,19 @@ class MateriController extends Controller
             'filters' => $request->only(['search', 'type']),
         ]);
     }
+
+    public function show(Material $material)
+    {
+        $material->load(['teacher', 'classroom']);
+
+        $nextMateri = Material::where('class_id', $material->class_id)
+            ->where('order', '>', $material->order)
+            ->orderBy('order', 'asc')
+            ->first();
+
+        return Inertia::render('Siswa/Materi/Show', [
+            'material' => $material,
+            'nextMaterial' => $nextMateri,
+        ]);
+    }
 }

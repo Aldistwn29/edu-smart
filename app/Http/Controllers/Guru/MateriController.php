@@ -53,20 +53,22 @@ class MateriController extends Controller
             'class_id' => 'required|exists:class_rooms,id',
             'title' => 'required|string|max:100',
             'description' => 'nullable|string',
-            'type' => 'required|in:video,file',
-            'content' => 'required if:type,video|nullable|string',
-            'file' => 'required_if:type,file|nullable|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:20480',
+            'type' => 'required|in:video,text,file',
+            'content' => 'required_if:type,video|nullable|string',
+            'file' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:20480',
         ]);
 
         $material = new Material($request->only(['class_id', 'title', 'description', 'type']));
         $material->teacher_id = Auth::id();
 
-        if ($request->type === 'video') {
+        // Simpan konten (berlaku untuk video maupun text)
+        if ($request->filled('content')) {
             $material->content = $request->content;
-        } else {
-            if ($request->hasFile('file')) {
-                $material->file_path = $request->file('file')->store('materials', 'public');
-            }
+        }
+
+        // Simpan lampiran file (berlaku untuk semua tipe)
+        if ($request->hasFile('file')) {
+            $material->file_path = $request->file('file')->store('materials', 'public');
         }
 
         $material->save();
@@ -98,24 +100,26 @@ class MateriController extends Controller
             'class_id' => 'required|exists:class_rooms,id',
             'title' => 'required|string|max:100',
             'description' => 'nullable|string',
-            'type' => 'required|in:video,file',
-            'content' => 'required if:type,video|nullable|string',
+            'type' => 'required|in:video,text,file',
+            'content' => 'required_if:type,video|nullable|string',
             'file' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:20480',
         ]);
 
         $materi->update($request->only(['class_id', 'title', 'description', 'type']));
 
-        if ($request->type === 'video') {
+        // Simpan konten jika dikirimkan, atau hapus jika user mengosongkan (sedangkan tipenya bukan video)
+        // Note: Untuk update, kita perlu bisa mengosongkan content?
+        // Karena input form bisa mengirim string kosong
+        if ($request->has('content')) {
             $materi->content = $request->content;
-            $materi->file_path = null;
-        } else {
-            if ($request->hasFile('file')) {
-                if ($materi->file_path && Storage::disk('public')->exists($materi->file_path)) {
-                    Storage::disk('public')->delete($materi->file_path);
-                }
-                $materi->file_path = $request->file('file')->store('materials', 'public');
-                $materi->content = null;
+        }
+
+        // Simpan file jika ada file baru
+        if ($request->hasFile('file')) {
+            if ($materi->file_path && Storage::disk('public')->exists($materi->file_path)) {
+                Storage::disk('public')->delete($materi->file_path);
             }
+            $materi->file_path = $request->file('file')->store('materials', 'public');
         }
 
         $materi->save();

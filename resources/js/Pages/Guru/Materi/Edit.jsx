@@ -209,10 +209,10 @@ export default function Edit({ materi, classrooms }) {
                                                 color: 'bg-blue-500',
                                             },
                                             {
-                                                id: 'file',
-                                                label: 'Word/PDF/PPT',
+                                                id: 'text',
+                                                label: 'Text',
                                                 icon: FileText,
-                                                color: 'bg-orange-500',
+                                                color: 'bg-slate-500',
                                             },
                                         ].map((t) => (
                                             <button
@@ -240,18 +240,36 @@ export default function Edit({ materi, classrooms }) {
                                     </div>
                                 </div>
 
-                                {/* Dyanmic input */}
-                                {data.type === 'video' ? (
-                                    <div className="slide-in-form-top-2 trasition-all space-y-2 duration-300">
-                                        <Label className="text-xs font-black uppercase tracking-wider text-slate-400">
-                                            Url Video (Youtube / GG Drive)
-                                        </Label>
-
-                                        <div className="relative">
-                                            <VideoIcon className="absolute left-4 top-4 h-5 w-5 text-slate-400" />
-                                            <Input
-                                                placeholder="https://youtube.com/watch?v=..."
-                                                className="h-14 rounded-2xl border-slate-100 bg-slate-50 pl-12 focus:ring-primary"
+                                {/* Dynamic Input */}
+                                <div className="mt-6">
+                                    {data.type === 'video' ? (
+                                        <div className="slide-in-form-top-2 space-y-2 transition-all duration-300 animate-in">
+                                            <Label className="text-xs font-black uppercase tracking-wider text-slate-400">
+                                                URL Video (YouTube / GDrive)
+                                            </Label>
+                                            <div className="relative">
+                                                <VideoIcon className="absolute left-4 top-4 h-5 w-5 text-slate-400" />
+                                                <Input
+                                                    placeholder="https://youtube.com/watch?v=..."
+                                                    className="h-14 rounded-2xl border-slate-100 bg-slate-50 pl-12 focus:ring-primary"
+                                                    value={data.content}
+                                                    onChange={(e) =>
+                                                        setData(
+                                                            'content',
+                                                            e.target.value,
+                                                        )
+                                                    }
+                                                />
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="slide-in-form-top-2 space-y-2 transition-all duration-300 animate-in">
+                                            <Label className="text-xs font-black uppercase tracking-wider text-slate-400">
+                                                Isi Materi Tekstual
+                                            </Label>
+                                            <Textarea
+                                                placeholder="Tuliskan materi pembelajaran lengkap di sini..."
+                                                className="min-h-[200px] rounded-2xl border-slate-100 bg-slate-50 p-4 focus:ring-primary"
                                                 value={data.content}
                                                 onChange={(e) =>
                                                     setData(
@@ -261,35 +279,51 @@ export default function Edit({ materi, classrooms }) {
                                                 }
                                             />
                                         </div>
-                                    </div>
-                                ) : (
-                                    <div className="slide-in-form-top-2 space-y-2 transition-all duration-300 animate-in">
-                                        <Label className="text-xs font-black uppercase tracking-wider text-slate-400">
-                                            Unggah File materi
-                                        </Label>
+                                    )}
+                                    {errors.content && (
+                                        <p className="mt-1 text-xs font-medium text-red-500">
+                                            {errors.content}
+                                        </p>
+                                    )}
+                                </div>
 
-                                        <div className="flex h-32 w-full items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/50 transition-colors hover:border-primary">
-                                            <Label className="flex w-full cursor-pointer flex-col items-center justify-center gap-2 px-4 py-8">
-                                                <Plus className="h-8 w-8 text-slate-400" />
-                                                <span className="text-center text-sm font-medium text-slate-400">
-                                                    {data.file
-                                                        ? data.file.name
-                                                        : 'Klik untuk upload file'}
-                                                </span>
-                                                <Input
-                                                    type="file"
-                                                    className="hidden"
-                                                    onChange={(e) =>
-                                                        setData(
-                                                            'file',
-                                                            e.target.files[0],
-                                                        )
-                                                    }
-                                                />
-                                            </Label>
-                                        </div>
+                                {/* Input File Tambahan (file_path) - Selalu Muncul di Bawah */}
+                                <div className="mt-8 space-y-3 border-t border-slate-100 pt-6">
+                                    <div className="flex items-center justify-between">
+                                        <Label className="text-xs font-black uppercase tracking-wider text-slate-400">
+                                            Lampiran File (PDF/PPT/DOCX)
+                                        </Label>
+                                        <span className="text-[10px] font-bold uppercase italic text-slate-400">
+                                            Opsional
+                                        </span>
                                     </div>
-                                )}
+
+                                    <div className="flex h-24 w-full items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/50 transition-colors hover:border-primary">
+                                        <Label className="flex w-full cursor-pointer flex-col items-center justify-center gap-1 px-4 py-4">
+                                            <Plus className="h-6 w-6 text-slate-400" />
+                                            <span className="text-center text-xs font-medium text-slate-500">
+                                                {data.file
+                                                    ? data.file.name
+                                                    : 'Tambahkan dokumen pendukung jika ada'}
+                                            </span>
+                                            <Input
+                                                type="file"
+                                                className="hidden"
+                                                onChange={(e) =>
+                                                    setData(
+                                                        'file',
+                                                        e.target.files[0],
+                                                    )
+                                                }
+                                            />
+                                        </Label>
+                                    </div>
+                                    {errors.file && (
+                                        <p className="text-xs font-medium text-red-500">
+                                            {errors.file}
+                                        </p>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>

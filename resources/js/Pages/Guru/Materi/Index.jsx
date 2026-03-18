@@ -87,7 +87,7 @@ export default function Index({ materials, filters }) {
                     </div>
 
                     <div className="flex w-full items-center justify-center rounded-lg bg-gray-100 p-1 sm:w-auto">
-                        {['all', 'video', 'file'].map((t) => (
+                        {['all', 'video', 'text'].map((t) => (
                             <Button
                                 key={t}
                                 onClick={() => handleFilter(t)}

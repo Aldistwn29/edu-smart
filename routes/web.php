@@ -90,5 +90,6 @@ Route::middleware(['role:siswa'])->prefix('siswa')->name('siswa.')->group(functi
 
     // Materi
     Route::get('/materies', [SiswaMateriController::class, 'index'])->name('materies.index');
+    Route::get('/materies/{material}', [SiswaMateriController::class, 'show'])->name('materies.show');
 });
 require __DIR__.'/auth.php';

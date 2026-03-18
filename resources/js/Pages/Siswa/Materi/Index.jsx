@@ -63,7 +63,7 @@ export default function Index({ materials, filters = {} }) {
 
                     <div className="flex justify-start lg:col-span-4 lg:justify-end">
                         <div className="border-boder no-scrollbar inline-flex max-w-full overflow-x-auto rounded-full border bg-muted/50 p-1 backdrop-blur-sm">
-                            {['Semua', 'Video', 'File', 'Text'].map((type) => {
+                            {['Semua', 'Video', 'Text'].map((type) => {
                                 const isActive =
                                     filters.type === type.toLowerCase() ||
                                     (!filters.type && type === 'Semua');
@@ -71,9 +71,9 @@ export default function Index({ materials, filters = {} }) {
                                     <Button
                                         key={type}
                                         onClick={() => handleFilter(type)}
-                                        variant={isActive ? 'hero' : 'ghost'}
+                                        variant={isActive ? 'default' : 'ghost'}
                                         size="sm"
-                                        className="rounded-xl px-6 transition-all duration-300"
+                                        className="rounded-xl px-6 transition-all duration-300 hover:bg-primary hover:text-primary-foreground"
                                     >
                                         {type}
                                     </Button>
@@ -156,7 +156,12 @@ export default function Index({ materials, filters = {} }) {
                                                     size="xl"
                                                     className="group/btn w-full rounded-[1.25rem] border-primary/20 text-sm font-bold shadow-sm hover:border-primary/50 lg:w-auto"
                                                 >
-                                                    <Link href={'#'}>
+                                                    <Link
+                                                        href={route(
+                                                            'siswa.materies.show',
+                                                            item.id,
+                                                        )}
+                                                    >
                                                         Details Materi
                                                         <ChevronRight
                                                             size={20}
