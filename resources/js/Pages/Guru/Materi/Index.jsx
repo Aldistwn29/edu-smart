@@ -13,7 +13,7 @@ import { Button, buttonVariants } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, router } from '@inertiajs/react';
-import { FileText, Pencil, Search, Trash, Video } from 'lucide-react';
+import { Eye, FileText, Pencil, Search, Trash, Video } from 'lucide-react';
 
 export default function Index({ materials, filters }) {
     const handleFilter = (type) => {
@@ -174,6 +174,23 @@ export default function Index({ materials, filters }) {
 
                                 {/* Footer: Tombol Aksi */}
                                 <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:justify-end">
+                                    {/* Tombol Lihat Progress */}
+                                    <Link
+                                        href={route(
+                                            'guru.materies.show',
+                                            material.id,
+                                        )}
+                                        className={buttonVariants({
+                                            variant: 'secondary',
+                                            size: 'sm',
+                                            className:
+                                                'w-full rounded-xl sm:w-32 bg-blue-50 text-blue-600 hover:bg-blue-100',
+                                        })}
+                                    >
+                                        <Eye className="mr-2 h-4 w-4" />
+                                        Progress
+                                    </Link>
+
                                     {/* Tombol Edit */}
                                     <Link
                                         href={route(

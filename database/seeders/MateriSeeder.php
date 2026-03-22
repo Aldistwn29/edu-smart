@@ -23,52 +23,59 @@ class MateriSeeder extends Seeder
         // Materi MTK
         if ($kelasMTK && $guruMTK) {
             $materiMTK = [
-                [
-                    'title' => 'Aljabar Dasar',
-                    'description' => 'Pintu awal untuk berkenalan dengan matematika. Tetap positif dan semangat ya!',
-                    'order' => 1,
-                ],
-                [
-                    'title' => 'Persamaan Linear Satu Variabel',
-                    'description' => 'Mengenal variabel dan cara menyelesaikan persamaan linear sederhana.',
-                    'order' => 2,
-                ],
-                [
-                    'title' => 'Pertidaksamaan Linear',
-                    'description' => 'Mempelajari hubungan ketidaksamaan dalam aljabar.',
-                    'order' => 3,
-                ],
-                [
-                    'title' => 'Sistem Koordinat Kartesius',
-                    'description' => 'Cara menentukan posisi titik pada bidang koordinat.',
-                    'order' => 4,
-                ],
+                ['title' => 'Aljabar Dasar', 'description' => 'Pintu awal untuk berkenalan dengan bilangan dan huruf sebagai pengganti angka.'],
+                ['title' => 'Persamaan Linear Satu Variabel', 'description' => 'Bagaimana cara mencari nilai satu variabel yang belum diketahui.'],
+                ['title' => 'Pertidaksamaan Linear', 'description' => 'Mempelajari bentuk tidak sama (kurang dari, lebih dari) pada aljabar.'],
+                ['title' => 'Sistem Koordinat Kartesius', 'description' => 'Belajar posisi titik (x,y) pada grafik koordinat kartesius.'],
+                ['title' => 'Persamaan Linear Dua Variabel', 'description' => 'Menyelesaikan sistem persamaan dengan metode substitusi dan eliminasi.'],
+                ['title' => 'Teorema Pythagoras', 'description' => 'Rumus ajaib segitiga siku-siku dari dalil ilmuwan Pythagoras.'],
+                ['title' => 'Lingkaran dan Unsur-unsurnya', 'description' => 'Mengenal jari-jari, diameter, luas, keliling tepi, dan busur lingkaran.'],
+                ['title' => 'Bangun Ruang Sisi Datar', 'description' => 'Kenali kubus, balok, prisma, dan limas beserta jaring-jaring susunannya.'],
+                ['title' => 'Statistika Dasar', 'description' => 'Mencari mean, median, modus dari sebuah data acak maupun data berkelompok.'],
+                ['title' => 'Teori Peluang', 'description' => 'Seberapa besar kemungkinan sebuah dadu, kartu, atau koin muncul sisi tertentu.'],
             ];
 
-            foreach ($materiMTK as $mtk) {
+            foreach ($materiMTK as $index => $mtk) {
                 Material::create([
                     'class_id' => $kelasMTK->id,
                     'teacher_id' => $guruMTK->id,
                     'title' => $mtk['title'],
                     'description' => $mtk['description'],
                     'type' => 'text',
+                    'content' => '<p>Ini adalah konten detail pembelajaran untuk materi <strong>'.$mtk['title'].'</strong>. Silahkan diskusikan materi ini dengan teman-teman di kelas.</p>',
                     'file_path' => null,
-                    'order' => $mtk['order'],
+                    'order' => $index + 1,
                 ]);
             }
         }
 
         // Materi IPA
         if ($kelasIPA && $guruIPA) {
-            Material::create([
-                'class_id' => $kelasIPA->id,
-                'teacher_id' => $guruIPA->id,
-                'title' => 'Ekosistem',
-                'description' => 'Materi ini sebenarnya ga ribet, cuman mengingatkan aja di sekitar kita ada apa aja dan bagaimana interaksinya, yuk kita pelajari bareng-bareng',
-                'type' => 'text',
-                'file_path' => null,
-                'order' => 1,
-            ]);
+            $materiIPA = [
+                ['title' => 'Besaran dan Pengukuran Fisika', 'description' => 'Mengenal alat ukur seperti jangka sorong dan satuan standar internasional.'],
+                ['title' => 'Klasifikasi Makhluk Hidup', 'description' => 'Mengapa hewan dan tumbuhan dikelompokkan berdasarkan familinya dan bagaimana caranya.'],
+                ['title' => 'Zat dan Karakteristik Wujudnya', 'description' => 'Mengenal ciri-ciri fisik zat padat, zat cair, gas, dan proses perubahannya.'],
+                ['title' => 'Suhu dan Pemuaian Benda', 'description' => 'Apa itu suhu, fungsi alat termometer, dan kondisi benda yang memuai akibat energi.'],
+                ['title' => 'Kalor dan Perpindahan Suhu', 'description' => 'Konduksi, konveksi, dan radiasi panas dalam kehidupan sehari-hari kita.'],
+                ['title' => 'Energi dalam Sistem Kehidupan (Biologi)', 'description' => 'Bagaimana tumbuhan bereproduksi dan hewan membakar energi untuk bertahan hidup.'],
+                ['title' => 'Sistem Organisasi Kehidupan', 'description' => 'Dari organisme sel tunggal kecil hingga menjadi organisme makhluk utuh yang kompleks.'],
+                ['title' => 'Ekosistem dan Interaksi Lingkungan', 'description' => 'Mengenal lebih dekat rantai makanan, ikatan simbiosis, dan jaring-jaring siklus alam.'],
+                ['title' => 'Pencemaran Lingkungan', 'description' => 'Dampak limbah terhadap air, partikel racun udara, dan susunan nutrisi tanah di sekitar kita.'],
+                ['title' => 'Pemanasan Global', 'description' => 'Bahaya laten efek rumah kaca dan anomali perubahan iklim yang terjadi di bumi belakangan ini.'],
+            ];
+
+            foreach ($materiIPA as $index => $ipa) {
+                Material::create([
+                    'class_id' => $kelasIPA->id,
+                    'teacher_id' => $guruIPA->id,
+                    'title' => $ipa['title'],
+                    'description' => $ipa['description'],
+                    'type' => 'text',
+                    'content' => '<p>Ini adalah konten detail pembelajaran untuk materi <strong>'.$ipa['title'].'</strong>. Silahkan observasi materi ini dengan lingkungan sekitarmu.</p>',
+                    'file_path' => null,
+                    'order' => $index + 1,
+                ]);
+            }
         }
     }
 }

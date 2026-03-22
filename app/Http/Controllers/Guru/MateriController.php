@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\ClassRoom;
 use App\Models\Material;
+use App\Models\MateriProgres;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -134,6 +135,30 @@ class MateriController extends Controller
         ]);
 
         return redirect()->route('guru.materies.index')->with('success', 'Materi Berhasil diperbaharui!');
+    }
+
+    public function show(Material $materi)
+    {
+        $materi->load('classroom');
+
+        $completedStudents = MateriProgres::where('material_id', $materi->id)
+            ->where('is_completed', true)
+            ->get()
+            ->keyBy('student_id');
+
+        $students = $materi->classroom->students()
+            ->get()
+            ->map(function ($student) use ($completedStudents) {
+                $student->is_completed = $completedStudents->has($student->id);
+                $student->completed_at = $student->is_completed ? $completedStudents[$student->id]->created_at : null;
+
+                return $student;
+            });
+
+        return Inertia::render('Guru/Materi/Show', [
+            'materi' => $materi,
+            'students' => $students,
+        ]);
     }
 
     public function destroy(Material $materi)

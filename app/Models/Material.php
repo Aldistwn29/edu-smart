@@ -15,6 +15,7 @@ class Material extends Model
         'content',
         'file_path',
         'order',
+        'status',
     ];
 
     protected $appends = ['file_path_url'];

@@ -58,6 +58,7 @@ Route::middleware(['role:guru'])->prefix('guru')->name('guru.')->group(function 
     Route::get('/materies/create', [MateriController::class, 'create'])->name('materies.create');
     Route::post('/materies', [MateriController::class, 'store'])->name('materies.store');
     Route::get('/materies/{materi}/edit', [MateriController::class, 'edit'])->name('materies.edit');
+    Route::get('/materies/{materi}', [MateriController::class, 'show'])->name('materies.show');
     Route::put('/materies/{materi}', [MateriController::class, 'update'])->name('materies.update');
     Route::delete('/materies/{materi}/delete', [MateriController::class, 'destroy'])->name('materies.destroy');
 
@@ -91,5 +92,6 @@ Route::middleware(['role:siswa'])->prefix('siswa')->name('siswa.')->group(functi
     // Materi
     Route::get('/materies', [SiswaMateriController::class, 'index'])->name('materies.index');
     Route::get('/materies/{material}', [SiswaMateriController::class, 'show'])->name('materies.show');
+    Route::post('/materies/{material}/completed', [SiswaMateriController::class, 'completed'])->name('materies.completed');
 });
 require __DIR__.'/auth.php';

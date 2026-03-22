@@ -105,10 +105,10 @@ class QuizController extends Controller
 
         foreach ($quiz->questions as $question) {
             $studentAnswer = $answers[$question->id] ?? null;
-            
+
             // Handle array case to avoid "Array to string conversion" error
             $dbAnswer = is_array($studentAnswer) ? json_encode($studentAnswer) : (string) ($studentAnswer ?? '');
-            
+
             $isCorrect = $studentAnswer == $question->answer;
 
             if ($isCorrect) {

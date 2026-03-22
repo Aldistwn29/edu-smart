@@ -2,7 +2,7 @@ import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent } from '@/Components/ui/card';
 import DashboardLayout from '@/Layouts/DashboardLayout';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import {
     ArrowRight,
     CheckCircle2,
@@ -10,8 +10,11 @@ import {
     Download,
     FileText,
     Folder,
+    Loader2,
     User,
 } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 const getYoutubeId = (url) => {
     if (!url) return '';
@@ -21,7 +24,29 @@ const getYoutubeId = (url) => {
     return match && match[2].length === 11 ? match[2] : url;
 };
 
-export default function Show({ material, nextMaterial }) {
+export default function Show({ material, nextMaterial, isCompleted }) {
+    const [isLoading, setIsLoading] = useState(false);
+
+    // Handler untuk menandai materi sudah selesai di baca
+    const handleMarkAsCompleted = () => {
+        if (isCompleted) return;
+
+        router.post(
+            route('siswa.materies.completed', material.id),
+            {},
+            {
+                preserveScroll: true,
+                onStart: () => setIsLoading(true),
+                onFinish: () => setIsLoading(false),
+                onSuccess: () => {
+                    toast.success('Materi berhasil ditandai selesai');
+                },
+                onError: () => {
+                    toast.error('Gagal menandai materi selesai');
+                },
+            },
+        );
+    };
     return (
         <DashboardLayout>
             <Head title={`Materi ${material.title}`} />
@@ -68,13 +93,14 @@ export default function Show({ material, nextMaterial }) {
                                                 variant="secondary"
                                                 className="rounded-full px-4 py-1 text-xs font-black uppercase tracking-wider"
                                             >
-                                                {material.classroom.name || 'Mata Pelajaran'}
+                                                {material.classroom.name ||
+                                                    'Mata Pelajaran'}
                                             </Badge>
-                                            <span className="tracking-widest rounded-full bg-primary/10 px-4 py-1 text-[10px] font-black uppercase text-primary">
+                                            <span className="rounded-full bg-primary/10 px-4 py-1 text-[10px] font-black uppercase tracking-widest text-primary">
                                                 {material.type}
                                             </span>
                                         </div>
-                                        <h1 className="uppercase text-3xl font-black tracking-tight text-foreground md:text-4xl">
+                                        <h1 className="text-3xl font-black uppercase tracking-tight text-foreground md:text-4xl">
                                             {material.title}
                                         </h1>
                                         <p className="text-sm font-medium text-muted-foreground md:text-base">
@@ -103,7 +129,8 @@ export default function Show({ material, nextMaterial }) {
                                         />
                                     ) : (
                                         <p className="italic text-muted-foreground">
-                                            Silahkan pelajari materi selengkapnya
+                                            Silahkan pelajari materi
+                                            selengkapnya
                                         </p>
                                     )}
                                 </article>
@@ -115,11 +142,25 @@ export default function Show({ material, nextMaterial }) {
                     <div className="space-y-6 lg:col-span-4">
                         {/* Tombol mark complate */}
                         <Button
-                            variant="default"
-                            className="w-full rounded-full px-4 py-1 text-sm font-black uppercase tracking-wider"
+                            onClick={handleMarkAsCompleted}
+                            disabled={isCompleted || isLoading}
+                            className={`w-full rounded-2xl py-8 text-sm font-black uppercase tracking-wider shadow-md transition-all ${
+                                isCompleted
+                                    ? 'cursor-default bg-success text-success-foreground hover:bg-success'
+                                    : 'shadow-glow bg-primary text-primary-foreground hover:scale-[1.02] active:scale-95'
+                            } `}
                         >
-                            <CheckCircle2 className="mr-2 h-4 w-4" />
-                            Tandai Selesai
+                            {isLoading ? (
+                                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                            ) : isCompleted ? (
+                                <CheckCircle2 className="mr-2 h-5 w-5" />
+                            ) : (
+                                <CheckCircle2 className="mr-2 h-5 w-5" />
+                            )}
+
+                            {isCompleted
+                                ? 'Materi Selesai'
+                                : 'Tandai Materi Selesai'}
                         </Button>
 
                         {/* Card resouce materi */}
@@ -136,7 +177,7 @@ export default function Show({ material, nextMaterial }) {
                                 {material.file_path ? (
                                     <div className="flex items-center justify-between rounded-2xl border border-border bg-card/50 p-4 transition-all hover:border-primary/50 hover:bg-card">
                                         <div className="flex items-center gap-4">
-                                            <div className="bg-priamry/10 flex h-12 w-12 items-center justify-center rounded-xl text-primary">
+                                            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
                                                 <FileText size={24} />
                                             </div>
                                             <div>
@@ -171,35 +212,34 @@ export default function Show({ material, nextMaterial }) {
                         </Card>
 
                         {/* Card next lesson */}
-                        <Card className="rounded-[2rem] border border-none border-border/40 bg-card p-6 shadow-sm">
-                            <div className="space-y-3">
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">
-                                    Materi Selanjutnya
-                                </span>
-                                <h4 className="text-lg font-bold leading-tight text-foreground">
-                                    {nextMaterial ? nextMaterial.title : 'Coming Soon'}
-                                </h4>
-                                {nextMaterial ? (
-                                    <Button
-                                        variant="outline"
-                                        className="h-auto p-0 text-xs font-black uppercase tracking-wider text-primary"
-                                        asChild
-                                    >
-                                        <Link href={route('siswa.materies.show', nextMaterial.id)}>
-                                            Pelajari Sekarang
-                                            <ArrowRight
-                                                size={18}
-                                                className="ml-1"
-                                            />
-                                        </Link>
-                                    </Button>
-                                ) : (
-                                    <p className="text-xs font-medium text-muted-foreground">
-                                        Belum tersedia.
-                                    </p>
-                                )}
+                        {nextMaterial ? (
+                            <Link 
+                                href={route('siswa.materies.show', nextMaterial.id)} 
+                                className="group block"
+                            >
+                                <Card className="rounded-[2rem] border border-border/50 bg-card p-6 shadow-sm transition-all duration-300 hover:border-primary/50 hover:shadow-md">
+                                    <div className="space-y-4">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">
+                                                Materi Selanjutnya
+                                            </span>
+                                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary transition-transform duration-300 group-hover:translate-x-1 group-hover:bg-primary group-hover:text-primary-foreground">
+                                                <ArrowRight size={14} />
+                                            </div>
+                                        </div>
+                                        <h4 className="text-lg font-bold leading-tight text-foreground">
+                                            {nextMaterial.title}
+                                        </h4>
+                                    </div>
+                                </Card>
+                            </Link>
+                        ) : (
+                            <div className="flex items-center justify-center rounded-[2rem] border border-dashed border-border bg-muted/20 p-8 text-center shadow-sm">
+                                <p className="text-sm font-medium text-muted-foreground">
+                                    Semua materi telah diselesaikan
+                                </p>
                             </div>
-                        </Card>
+                        )}
                     </div>
                 </div>
             </div>

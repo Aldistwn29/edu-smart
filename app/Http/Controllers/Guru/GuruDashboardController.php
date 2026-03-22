@@ -25,7 +25,7 @@ class GuruDashboardController extends Controller
         $newStudentsThisMonth = User::where('role', 'siswa')
             ->whereHas('enrolledClasses', function ($q) use ($teacher_id) {
                 $q->where('teacher_id', $teacher_id)
-                  ->where('classroom_user.created_at', '>=', now()->startOfMonth());
+                    ->where('classroom_user.created_at', '>=', now()->startOfMonth());
             })
             ->count();
 
