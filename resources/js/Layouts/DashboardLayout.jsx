@@ -66,13 +66,21 @@ export default function DashbordLayout({ children }) {
                       label: 'Kelas',
                       href: route('siswa.classroom.index'),
                   },
-                  { icon: BookOpen, label: 'Mata Pelajaran', href: route('siswa.materies.index') },
+                  {
+                      icon: BookOpen,
+                      label: 'Mata Pelajaran',
+                      href: route('siswa.materies.index'),
+                  },
                   {
                       icon: ClipboardList,
                       label: 'Quiz',
                       href: route('siswa.quizzes.index'),
                   },
-                  { icon: Notebook, label: 'Penugasan', href: '#' },
+                  {
+                      icon: Notebook,
+                      label: 'Penugasan',
+                      href: route('siswa.assigements.index'),
+                  },
                   { icon: MessageSquare, label: 'Ai Chatbot', href: '#' },
                   { icon: Settings, label: 'Pengaturan', href: '#' },
               ];

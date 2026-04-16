@@ -6,6 +6,7 @@ use App\Http\Controllers\Guru\GuruDashboardController;
 use App\Http\Controllers\Guru\MateriController;
 use App\Http\Controllers\Guru\QuizController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Siswa\AssigementController;
 use App\Http\Controllers\Siswa\ClassRoomController as SiswaClassRoomController;
 use App\Http\Controllers\Siswa\MateriController as SiswaMateriController;
 use App\Http\Controllers\Siswa\QuizController as SiswaQuizController;
@@ -93,5 +94,8 @@ Route::middleware(['role:siswa'])->prefix('siswa')->name('siswa.')->group(functi
     Route::get('/materies', [SiswaMateriController::class, 'index'])->name('materies.index');
     Route::get('/materies/{material}', [SiswaMateriController::class, 'show'])->name('materies.show');
     Route::post('/materies/{material}/completed', [SiswaMateriController::class, 'completed'])->name('materies.completed');
+
+    // Penugasan
+    Route::get('/assigements', [AssigementController::class, 'index'])->name('assigements.index');
 });
 require __DIR__.'/auth.php';
