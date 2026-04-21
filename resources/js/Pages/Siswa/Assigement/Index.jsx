@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/Components/ui/card';
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link } from '@inertiajs/react';
 import {
+    ArrowRight,
     ArrowUpRight,
     BookOpen,
     Calendar,
@@ -14,6 +15,25 @@ import {
     User,
 } from 'lucide-react';
 import { useState } from 'react';
+
+const resolveStatus = (status) => {
+    switch (status) {
+        case 'Mampu di kerjakan':
+        case 'Belum di kumpulkan':
+            return { text: 'Belum di kumpulkan', className: 'bg-red-100 text-red-700' };
+        case 'Sedang dinilai':
+        case 'Sudah di kumpulkan':
+            return { text: 'Sudah di kumpulkan', className: 'bg-amber-100 text-amber-700' };
+        case 'Sudah dinilai':
+        case 'Sudah di nilai':
+            return { text: 'Sudah di nilai', className: 'bg-green-100 text-green-700' };
+        case 'Sudah lewat':
+            return { text: 'Sudah lewat', className: 'bg-slate-100 text-slate-700' };
+        default:
+            return { text: status, className: 'bg-primary/10 text-primary' };
+    }
+};
+
 export default function Index({ assigement, stats, auth }) {
     // 1. State untuk menyimpan filter yang dipilih
     const [activeTab, setActiveTab] = useState('Semua');
@@ -21,23 +41,14 @@ export default function Index({ assigement, stats, auth }) {
     // 2. Logika memfilter data berdasarkan status dari backend
     const filteredTasks = assigement.filter((task) => {
         if (activeTab === 'Semua') return true;
-
-        // Mapping Tab ke Status dari Backend
-        if (activeTab === 'Kumpulkan') {
-            return (
-                task.status === 'Mampu di kerjakan' ||
-                task.status === 'Sudah lewat'
-            );
-        }
-        if (activeTab === 'Sudah dinilai') {
-            return task.status === 'Sudah dinilai';
-        }
-        return true;
+        const statusText = resolveStatus(task.status).text;
+        return statusText === activeTab;
     });
+
     return (
         <DashboardLayout>
-            <Head title="Management Tugas Siwa" />
-            <div className="animate-fade-in-up space-y-8">
+            <Head title="Management Tugas Siswa" />
+            <div className="w-full animate-fade-in-up space-y-8">
                 {/* Header */}
                 <div>
                     <h1 className="text-2xl font-black text-foreground">
@@ -49,10 +60,10 @@ export default function Index({ assigement, stats, auth }) {
                 </div>
 
                 {/* Hero Card */}
-                <Card className="relative overflow-hidden rounded-[2.5rem] border-none bg-slate-50/50 shadow-none ring-1 ring-slate-200/60">
+                <Card className="relative overflow-hidden rounded-[2.5rem] border-none bg-slate-50/50 shadow-none ring-1 ring-slate-200/60 w-full">
                     <CardContent className="p-10 md:p-12">
                         {/* Konten Utama */}
-                        <div className="relative z-10 grid grid-cols-1 items-center gap-10 lg:grid-cols-12">
+                        <div className="relative z-10 grid grid-cols-1 items-center gap-10 lg:grid-cols-12 w-full">
                             {/* Sisi Kiri: Pesan Sapaan & Stat Box */}
                             <div className="space-y-10 lg:col-span-8">
                                 <div className="space-y-3 text-center md:text-left">
@@ -108,15 +119,15 @@ export default function Index({ assigement, stats, auth }) {
 
                 {/* Filter */}
                 <div className="flex flex-wrap items-center gap-3">
-                    {['Semua', 'Kumpulkan', 'Sudah dinilai'].map((tab) => (
+                    {['Semua', 'Belum di kumpulkan', 'Sudah di kumpulkan', 'Sudah di nilai', 'Sudah lewat'].map((tab) => (
                         <Button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
                             variant={activeTab === tab ? 'default' : 'ghost'}
-                            className={`rounded-full px-6 text-[10px] font-black uppercase tracking-widest transition-all ${
+                            className={`rounded-full px-5 text-[10px] font-black uppercase tracking-widest transition-all ${
                                 activeTab === tab
                                     ? 'shadow-glow bg-primary text-primary-foreground'
-                                    : 'bg-muted text-muted-foreground hover:bg-primary'
+                                    : 'bg-muted text-muted-foreground hover:bg-primary hover:text-primary-foreground'
                             }`}
                         >
                             {tab}
@@ -125,7 +136,7 @@ export default function Index({ assigement, stats, auth }) {
                 </div>
 
                 {/* Assigment Grid */}
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3 w-full">
                     {filteredTasks.length > 0 ? (
                         filteredTasks.map((task) => (
                             <AssigementCard key={task.id} task={task} />
@@ -156,15 +167,15 @@ export default function Index({ assigement, stats, auth }) {
 
 // function sub component
 function StatItem({ icon, label, value, color }) {
-    const clorClasses = {
-        primary: 'bg-primary/10 text-primary ',
+    const colorClasses = {
+        primary: 'bg-primary/10 text-primary',
         destructive: 'bg-destructive/10 text-destructive',
-        success: 'bg-success/10 text-success',
+        success: 'bg-emerald-100 text-emerald-700',
     };
 
     return (
         <div className="flex items-center gap-3 rounded-2xl border border-border/50 bg-muted/30 px-5 py-3">
-            <div className={`rounded-xl p-2 ${clorClasses[color]}`}>{icon}</div>
+            <div className={`rounded-xl p-2 ${colorClasses[color]}`}>{icon}</div>
             <div>
                 <p className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
                     {label}
@@ -176,39 +187,42 @@ function StatItem({ icon, label, value, color }) {
 }
 
 function AssigementCard({ task }) {
-    const isOverdue = task.status === 'Sudah lewat';
-
+    const badgeStatus = resolveStatus(task.status);
+    
     return (
-        <Card>
-            <CardContent className="hover:shadow-glow group relative overflow-hidden rounded-[2rem] border-none shadow-sm ring-1 ring-border/50 transition-all hover:ring-primary/20">
-                <CardContent className="space-y-5 p-6">
-                    {/* Bade Header */}
+        <Link href={route('siswa.assigements.show', task.id)} className="block group">
+            <Card className="h-full overflow-hidden rounded-[2rem] border-none shadow-sm ring-1 ring-border/50 transition-all group-hover:shadow-glow group-hover:ring-primary/20">
+                <CardContent className="space-y-5 p-6 flex flex-col h-full">
+                    {/* Badge Header */}
                     <div className="flex items-center justify-between">
                         <Badge
-                            className={`rounded-full px-3 py-0.5 text-[10px] font-black uppercase ${isOverdue ? 'bg-destructive/10 text-destructive' : 'bg-success/10 text-success'}`}
+                            className={`rounded-full px-3 py-0.5 text-[10px] font-black uppercase ${badgeStatus.className}`}
                         >
-                            {task.status}
+                            {badgeStatus.text}
                         </Badge>
                         <Button
                             size="icon"
-                            variant="scondary"
+                            variant="secondary"
                             className="h-8 w-8 rounded-lg bg-primary/10 text-primary transition-transform group-hover:rotate-45"
+                            asChild
                         >
-                            <ArrowUpRight size={16} />
+                            <div>
+                                <ArrowUpRight size={16} />
+                            </div>
                         </Button>
                     </div>
                     {/* Body */}
-                    <div className="space-y-2">
+                    <div className="space-y-2 flex-grow">
                         <Badge
                             variant="outline"
-                            className="tracking-widset border-priamry/20 text-[9px] font-black uppercase text-primary"
+                            className="tracking-widest border-primary/20 text-[9px] font-black uppercase text-primary"
                         >
                             {task.type}
                         </Badge>
-                        <h3 className="text-base font-bold leading-tight transition-colors group-hover:text-primary">
-                            {task.titile}
+                        <h3 className="text-base font-bold leading-tight transition-colors group-hover:text-primary pt-1">
+                            {task.title}
                         </h3>
-                        <div className="flex items-center gap-2 text-muted-foreground">
+                        <div className="flex items-center gap-2 text-muted-foreground pt-1">
                             <div className="flex h-6 w-6 items-center justify-center rounded-full bg-muted">
                                 <User
                                     size={12}
@@ -219,7 +233,9 @@ function AssigementCard({ task }) {
                                 {task.teacher}
                             </span>
                         </div>
-                        {/* Footer info */}
+                    </div>
+                    {/* Footer info */}
+                    <div className="space-y-4">
                         <div className="flex items-center gap-4 border-t border-border/50 pt-4 text-[11px] font-bold text-muted-foreground">
                             <div className="flex items-center gap-1.5">
                                 <Calendar size={14} className="text-primary" />
@@ -228,11 +244,11 @@ function AssigementCard({ task }) {
                         </div>
 
                         {/* Progress Bar (Jika sedang dikerjakan) */}
-                        {!isOverdue && (
+                        {badgeStatus.text !== 'Sudah lewat' && (
                             <div className="space-y-2">
                                 <div className="flex justify-between text-[10px] font-black uppercase tracking-wider">
                                     <span>Progress</span>
-                                    <span>{task.progress}</span>
+                                    <span>{task.progress}%</span>
                                 </div>
 
                                 <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
@@ -241,31 +257,17 @@ function AssigementCard({ task }) {
                                         style={{ width: `${task.progress}%` }}
                                     />
                                 </div>
-                                <div className="flex items-center justify-between pt-1">
-                                    <span className="text-[10px] font-medium italic text-muted-foreground">
-                                        Kumpulkan
+                                <div className="flex items-center justify-between pt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <span className="text-[10px] font-medium italic text-muted-foreground flex items-center gap-1">
+                                        Lihat Detail <ArrowRight size={10} />
                                     </span>
-                                    <Download
-                                        size={14}
-                                        className="cursor-pointer text-muted-foreground hover:text-primary"
-                                    />
                                 </div>
                             </div>
                         )}
-
-                        {/* View list */}
-                        {isOverdue && (
-                            <Link
-                                href="#"
-                                className="flex items-center justify-end text-[10px] font-black uppercase tracking-wider text-muted-foreground hover:text-primary"
-                            >
-                                View Details{' '}
-                                <ArrowUpRight size={12} className="ml-1" />
-                            </Link>
-                        )}
                     </div>
                 </CardContent>
-            </CardContent>
-        </Card>
+            </Card>
+        </Link>
     );
 }
+
