@@ -18,7 +18,9 @@ export default function Show({ assigement, auth }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        post(route('siswa.assigment.submit', assigement.id));
+        post(route('siswa.assigements.submit', assigement.id), {
+            forceFormData: true,
+        });
     };
 
     const resolveStatus = (status) => {
@@ -38,7 +40,25 @@ export default function Show({ assigement, auth }) {
                 return { text: status, className: 'bg-primary/10 text-primary' };
         }
     };
-    
+
+    const normalizeAttachmentPath = (path) => path?.replace(/\\/g, '/') ?? path;
+
+    const attachment = assigement.attachment;
+    const attachmentName = attachment?.name ?? null;
+    const attachmentType = attachment?.extension ? attachment.extension.toUpperCase() : 'FILE';
+    const attachmentColor = attachmentType === 'PDF' ? 'text-red-500' : attachmentType === 'WORD' ? 'text-blue-500' : attachmentType === 'ZIP' ? 'text-amber-500' : 'text-slate-500';
+    const attachmentUrl = attachment?.path ? `/storage/${normalizeAttachmentPath(attachment.path)}` : null;
+    const extraDocs = attachment
+        ? [
+              {
+                  name: attachmentName,
+                  type: attachmentType,
+                  color: attachmentColor,
+                  url: attachmentUrl,
+              },
+          ]
+        : [];
+
     const badgeStatus = resolveStatus(assigement.status);
 
     return (
@@ -114,37 +134,42 @@ export default function Show({ assigement, auth }) {
                                             Dokumen Tambahan
                                         </h3>
                                     </div>
-                                    <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                                        {[
-                                            {
-                                                name: 'File_tugas.PDF',
-                                                type: 'PDF',
-                                                color: 'text-red-500',
-                                            },
-                                            {
-                                                name: 'File_tugas.WORD',
-                                                type: 'WORD',
-                                                color: 'text-blue-500',
-                                            },
-                                        ].map((file, idx) => (
-                                            <div
-                                                key={idx}
-                                                className="group flex cursor-pointer items-center justify-between rounded-3xl border border-slate-100 bg-slate-50 p-5 transition-all hover:border-primary/50"
-                                            >
-                                                <div className="rounded-2xl bg-white p-3 shadow-sm">
-                                                    <span
-                                                        className={`text-[10px] font-black ${file.color}`}
-                                                    >
-                                                        {file.type}
-                                                    </span>
-                                                </div>
-                                                <Download
-                                                    className="text-slate-400 transition-colors group-hover:text-primary"
-                                                    size={18}
-                                                />
-                                            </div>
-                                        ))}
-                                    </div>
+                                    {extraDocs.length > 0 ? (
+                                        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                                            {extraDocs.map((file, idx) => (
+                                                <a
+                                                    key={idx}
+                                                    href={file.url}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="group flex items-center justify-between rounded-3xl border border-slate-100 bg-slate-50 p-5 transition-all hover:border-primary/50"
+                                                >
+                                                    <div className="rounded-2xl bg-white p-3 shadow-sm">
+                                                        <span
+                                                            className={`text-[10px] font-black ${file.color}`}
+                                                        >
+                                                            {file.type}
+                                                        </span>
+                                                    </div>
+
+                                                    <div className="min-w-0 flex-1 px-4">
+                                                        <p className="truncate text-sm font-black text-slate-900">
+                                                            {file.name}
+                                                        </p>
+                                                    </div>
+
+                                                    <Download
+                                                        className="text-slate-400 transition-colors group-hover:text-primary"
+                                                        size={18}
+                                                    />
+                                                </a>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="rounded-3xl border border-slate-100 bg-slate-50 px-5 py-7 text-center text-sm font-medium text-slate-500">
+                                            Tidak ada dokumen tambahan.
+                                        </div>
+                                    )}
                                 </CardContent>
                             </Card>
                         </div>

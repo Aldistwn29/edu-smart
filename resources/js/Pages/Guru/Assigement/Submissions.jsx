@@ -50,6 +50,41 @@ export default function Submissions({ assigment, submissions }) {
         feedback: '',
     });
 
+    const normalizeFilePath = (filePath) => filePath?.replace(/\\/g, '/') ?? filePath;
+
+    const getFileName = (filePath) => {
+        if (!filePath) {
+            return 'Tidak ada file';
+        }
+
+        const normalizedPath = normalizeFilePath(filePath);
+        const segments = normalizedPath.split('/');
+        return segments[segments.length - 1] || filePath;
+    };
+
+    const getFileTypeLabel = (filePath) => {
+        if (!filePath) {
+            return 'File';
+        }
+
+        const normalizedPath = normalizeFilePath(filePath);
+        const extension = normalizedPath.split('.').pop()?.toLowerCase();
+
+        if (extension === 'pdf') {
+            return 'PDF';
+        }
+
+        if (extension === 'doc' || extension === 'docx') {
+            return 'WORD';
+        }
+
+        if (extension === 'zip') {
+            return 'ZIP';
+        }
+
+        return 'File';
+    };
+
     const handleGradeOpen = (item) => {
         setSelectedSubmission(item);
         setData({
@@ -386,16 +421,10 @@ export default function Submissions({ assigment, submissions }) {
                                                                                         </div>
                                                                                         <div>
                                                                                             <p className="max-w-[150px] truncate text-sm font-black text-slate-900">
-                                                                                                {submission.file_path
-                                                                                                    .split(
-                                                                                                        '/',
-                                                                                                    )
-                                                                                                    .pop()}
+                                                                                                {getFileName(submission.file_path)}
                                                                                             </p>
                                                                                             <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                                                                                                PDF
-                                                                                                /
-                                                                                                Document
+                                                                                                {getFileTypeLabel(submission.file_path)}
                                                                                             </p>
                                                                                         </div>
                                                                                     </div>

@@ -98,5 +98,7 @@ Route::middleware(['role:siswa'])->prefix('siswa')->name('siswa.')->group(functi
     // Penugasan
     Route::get('/assigements', [AssigementController::class, 'index'])->name('assigements.index');
     Route::get('/assigements/{assigment}/show', [AssigementController::class, 'show'])->name('assigements.show');
+    Route::post('/assigements/{assigment}/submit', [AssigementController::class, 'store'])->name('assigements.submit');
+    Route::get('/assigements/{assigment}/success', [AssigementController::class, 'success'])->name('assigements.success');
 });
 require __DIR__.'/auth.php';

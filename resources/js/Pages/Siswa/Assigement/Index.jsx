@@ -188,86 +188,89 @@ function StatItem({ icon, label, value, color }) {
 
 function AssigementCard({ task }) {
     const badgeStatus = resolveStatus(task.status);
-    
+    const isPendingSubmission = ['Belum di kumpulkan', 'Sudah lewat'].includes(badgeStatus.text);
+    const isOverdue = badgeStatus.text === 'Sudah lewat';
+    const actionLabel = isPendingSubmission ? 'Kerjakan tugas' : 'Preview nilai';
+    const actionHref = isPendingSubmission
+        ? route('siswa.assigements.show', task.id)
+        : route('siswa.assigements.success', task.id);
+    const actionClassName = isOverdue
+        ? 'w-full rounded-[1.75rem] bg-slate-300 text-slate-700 hover:bg-slate-300'
+        : 'w-full rounded-[1.75rem] bg-primary text-primary-foreground hover:bg-primary/90';
+
     return (
-        <Link href={route('siswa.assigements.show', task.id)} className="block group">
-            <Card className="h-full overflow-hidden rounded-[2rem] border-none shadow-sm ring-1 ring-border/50 transition-all group-hover:shadow-glow group-hover:ring-primary/20">
-                <CardContent className="space-y-5 p-6 flex flex-col h-full">
-                    {/* Badge Header */}
-                    <div className="flex items-center justify-between">
-                        <Badge
-                            className={`rounded-full px-3 py-0.5 text-[10px] font-black uppercase ${badgeStatus.className}`}
-                        >
-                            {badgeStatus.text}
-                        </Badge>
-                        <Button
-                            size="icon"
-                            variant="secondary"
-                            className="h-8 w-8 rounded-lg bg-primary/10 text-primary transition-transform group-hover:rotate-45"
-                            asChild
-                        >
-                            <div>
-                                <ArrowUpRight size={16} />
-                            </div>
-                        </Button>
+        <Card className="h-full overflow-hidden rounded-[2rem] border-none shadow-sm ring-1 ring-border/50 transition-all hover:shadow-glow hover:ring-primary/20">
+            <CardContent className="space-y-5 p-6 flex flex-col h-full">
+                {/* Badge Header */}
+                <div className="flex items-center justify-between">
+                    <Badge
+                        className={`rounded-full px-3 py-0.5 text-[10px] font-black uppercase ${badgeStatus.className}`}
+                    >
+                        {badgeStatus.text}
+                    </Badge>
+                    <div className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary transition-transform group-hover:rotate-45">
+                        <ArrowUpRight size={16} />
                     </div>
-                    {/* Body */}
-                    <div className="space-y-2 flex-grow">
-                        <Badge
-                            variant="outline"
-                            className="tracking-widest border-primary/20 text-[9px] font-black uppercase text-primary"
-                        >
-                            {task.type}
-                        </Badge>
-                        <h3 className="text-base font-bold leading-tight transition-colors group-hover:text-primary pt-1">
-                            {task.title}
-                        </h3>
-                        <div className="flex items-center gap-2 text-muted-foreground pt-1">
-                            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-muted">
-                                <User
-                                    size={12}
-                                    className="text-muted-foreground"
+                </div>
+                {/* Body */}
+                <div className="space-y-2 flex-grow">
+                    <Badge
+                        variant="outline"
+                        className="tracking-widest border-primary/20 text-[9px] font-black uppercase text-primary"
+                    >
+                        {task.type}
+                    </Badge>
+                    <h3 className="text-base font-bold leading-tight text-slate-900 pt-1">
+                        {task.title}
+                    </h3>
+                    <div className="flex items-center gap-2 text-muted-foreground pt-1">
+                        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-muted">
+                            <User
+                                size={12}
+                                className="text-muted-foreground"
+                            />
+                        </div>
+                        <span className="text-xs font-semibold">
+                            {task.teacher}
+                        </span>
+                    </div>
+                </div>
+                {/* Footer info */}
+                <div className="space-y-4">
+                    <div className="flex items-center gap-4 border-t border-border/50 pt-4 text-[11px] font-bold text-muted-foreground">
+                        <div className="flex items-center gap-1.5">
+                            <Calendar size={14} className="text-primary" />
+                            {task.deadline}
+                        </div>
+                    </div>
+
+                    {badgeStatus.text !== 'Sudah lewat' && (
+                        <div className="space-y-2">
+                            <div className="flex justify-between text-[10px] font-black uppercase tracking-wider">
+                                <span>Progress</span>
+                                <span>{task.progress}%</span>
+                            </div>
+
+                            <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                                <div
+                                    className="h-full rounded-full bg-primary shadow-[0_0_10px_hsl(187_85%_43%/0.5)] transition-all duration-1000"
+                                    style={{ width: `${task.progress}%` }}
                                 />
                             </div>
-                            <span className="text-xs font-semibold">
-                                {task.teacher}
-                            </span>
-                        </div>
-                    </div>
-                    {/* Footer info */}
-                    <div className="space-y-4">
-                        <div className="flex items-center gap-4 border-t border-border/50 pt-4 text-[11px] font-bold text-muted-foreground">
-                            <div className="flex items-center gap-1.5">
-                                <Calendar size={14} className="text-primary" />
-                                {task.deadline}
+                            <div className="flex items-center justify-between pt-1 opacity-0 hover:opacity-100 transition-opacity">
+                                <span className="text-[10px] font-medium italic text-muted-foreground flex items-center gap-1">
+                                    Lihat Detail <ArrowRight size={10} />
+                                </span>
                             </div>
                         </div>
+                    )}
 
-                        {/* Progress Bar (Jika sedang dikerjakan) */}
-                        {badgeStatus.text !== 'Sudah lewat' && (
-                            <div className="space-y-2">
-                                <div className="flex justify-between text-[10px] font-black uppercase tracking-wider">
-                                    <span>Progress</span>
-                                    <span>{task.progress}%</span>
-                                </div>
-
-                                <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                                    <div
-                                        className="h-full rounded-full bg-primary shadow-[0_0_10px_hsl(187_85%_43%/0.5)] transition-all duration-1000"
-                                        style={{ width: `${task.progress}%` }}
-                                    />
-                                </div>
-                                <div className="flex items-center justify-between pt-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <span className="text-[10px] font-medium italic text-muted-foreground flex items-center gap-1">
-                                        Lihat Detail <ArrowRight size={10} />
-                                    </span>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </CardContent>
-            </Card>
-        </Link>
+                    <Button asChild className={actionClassName}>
+                        <Link href={actionHref}>{actionLabel}</Link>
+                    </Button>
+                </div>
+            </CardContent>
+        </Card>
     );
 }
 
