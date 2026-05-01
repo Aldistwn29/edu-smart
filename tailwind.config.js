@@ -120,5 +120,5 @@ export default {
         },
     },
 
-    plugins: [forms, animate],
+    plugins: [forms, animate, require('@tailwindcss/typography')],
 };

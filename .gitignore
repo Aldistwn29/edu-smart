@@ -1,9 +1,5 @@
+# Laravel & PHP
 /.phpunit.cache
-/node_modules
-/public/build
-/public/hot
-/public/storage
-/storage/*.key
 /vendor
 .env
 .env.backup
@@ -12,11 +8,62 @@
 Homestead.json
 Homestead.yaml
 auth.json
+
+# Node & Build
+/node_modules
+/public/build
+/public/hot
 npm-debug.log
 yarn-error.log
+
+# Storage & Cache
+/storage/*.key
+/storage/logs/*.log
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+!/storage/framework/cache/.gitkeep
+!/storage/framework/sessions/.gitkeep
+!/storage/framework/views/.gitkeep
+/bootstrap/cache/*
+!/bootstrap/cache/.gitkeep
+
+# Public Storage (symlink)
+/public/storage
+
+# IDE & Editor
 /.fleet
 /.idea
 /.vscode
+*.swp
+*.swo
+*~
+
+# OS Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Security & Documentation (Development Only)
+SECURITY_ANALYSIS.md
+SECURITY_IMPLEMENTATION_SUMMARY.md
+SECURITY_TEST_GUIDE.md
+SECURITY_IMPLEMENTATION_COMPLETE.md
+CLEANUP_RECOMMENDATIONS.md
+CLEANUP_RECOMMENDATIONS_UPDATED.md
+
+# Development Tools
 boost.json
 Agent.md
+AGENTS.md
 /.github
+
+# Temporary & Test Files
+test_*.php
+*.tmp
+*.bak
+
+# Database
+*.sqlite
+*.sqlite-journal
+database/database.sqlite

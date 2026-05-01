@@ -81,7 +81,11 @@ export default function DashbordLayout({ children }) {
                       label: 'Penugasan',
                       href: route('siswa.assigements.index'),
                   },
-                  { icon: MessageSquare, label: 'Ai Chatbot', href: '#' },
+                  {
+                      icon: MessageSquare,
+                      label: 'Ai Chatbot',
+                      href: route('siswa.chatbotai.index'),
+                  },
                   { icon: Settings, label: 'Pengaturan', href: '#' },
               ];
 

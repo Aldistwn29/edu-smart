@@ -23,6 +23,10 @@ class Quize extends Model
 
     public function getStatusAttribute()
     {
+        if (! auth()->check()) {
+            return 'tersedia';
+        }
+
         $attempt = $this->attempts()->where('student_id', auth()->id())->first();
 
         return $attempt ? 'selesai' : 'tersedia';

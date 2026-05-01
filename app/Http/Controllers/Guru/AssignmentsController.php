@@ -8,9 +8,11 @@ use App\Models\Assigment;
 use App\Models\AssigmentSubmission;
 use App\Models\ClassRoom;
 use App\Models\Material;
+use App\Rules\SecureFileUpload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class AssignmentsController extends Controller
@@ -60,11 +62,15 @@ class AssignmentsController extends Controller
             'description' => 'required|string',
             'deadline' => 'required|date|after:now',
             'submission_types' => 'required|array|min:1',
-            'attachment' => 'nullable|file|max:25600',
+            'attachment' => ['nullable', 'file', 'max:25600', new SecureFileUpload],
         ]);
 
         if ($request->hasFile('attachment')) {
-            $path = $request->file('attachment')->store('assigment/attachments', 'public');
+            $file = $request->file('attachment');
+            $extension = strtolower($file->getClientOriginalExtension());
+            $filename = Str::uuid().'.'.$extension;
+
+            $path = $file->storeAs('assignments/attachments', $filename, 'public');
             $validated['attachment_path'] = $path;
         }
 
@@ -89,11 +95,12 @@ class AssignmentsController extends Controller
         ]);
 
         return redirect()->route('guru.assigments.index')->with('success', 'Tugas Berhasil diterbitkan!');
-
     }
 
     public function edit(Assigment $assigment)
     {
+        $this->authorize('update', $assigment);
+
         return Inertia::render('Guru/Assigement/Edit', [
             'assigment' => $assigment,
             'classrooms' => ClassRoom::where('teacher_id', Auth::id())->get(),
@@ -103,6 +110,8 @@ class AssignmentsController extends Controller
 
     public function update(Request $request, Assigment $assigment)
     {
+        $this->authorize('update', $assigment);
+
         $validated = $request->validate([
             'class_id' => 'required|exists:class_rooms,id',
             'material_id' => 'nullable|exists:materials,id',
@@ -110,11 +119,20 @@ class AssignmentsController extends Controller
             'description' => 'required|string',
             'deadline' => 'required|date|after:now',
             'submission_types' => 'required|array|min:1',
-            'attachment' => 'nullable|file|max:25600',
+            'attachment' => ['nullable', 'file', 'max:25600', new SecureFileUpload],
         ]);
 
         if ($request->hasFile('attachment')) {
-            $path = $request->file('attachment')->store('assigment/attachments', 'public');
+            // Delete old attachment if exists
+            if ($assigment->attachment_path) {
+                Storage::disk('public')->delete($assigment->attachment_path);
+            }
+
+            $file = $request->file('attachment');
+            $extension = strtolower($file->getClientOriginalExtension());
+            $filename = Str::uuid().'.'.$extension;
+
+            $path = $file->storeAs('assignments/attachments', $filename, 'public');
             $validated['attachment_path'] = $path;
         }
 
@@ -142,6 +160,8 @@ class AssignmentsController extends Controller
 
     public function submissions(Assigment $assigment)
     {
+        $this->authorize('view', $assigment);
+
         $assigment->load(['classroom.students']);
 
         $submissions = $assigment->classroom->students->map(function ($student) use ($assigment) {
@@ -163,6 +183,8 @@ class AssignmentsController extends Controller
 
     public function grade(Request $request, AssigmentSubmission $submission)
     {
+        $this->authorize('grade', $submission->assigment);
+
         $validated = $request->validate([
             'score' => 'required|numeric|min:0|max:100',
             'feedback' => 'nullable|string',
@@ -188,6 +210,8 @@ class AssignmentsController extends Controller
 
     public function destroy(Assigment $assigment)
     {
+        $this->authorize('delete', $assigment);
+
         // Delete attachment if exists
         if ($assigment->attachment_path) {
             Storage::disk('public')->delete($assigment->attachment_path);

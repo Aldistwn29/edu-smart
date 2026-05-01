@@ -4,10 +4,13 @@ namespace App\Http\Controllers\Siswa;
 
 use App\Http\Controllers\Controller;
 use App\Models\Assigment;
+use App\Rules\SecureFileUpload;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -76,7 +79,7 @@ class AssigementController extends Controller
 
     public function show(Assigment $assigment): Response
     {
-        $this->authorizeStudentForAssignment($assigment);
+        $this->authorize('view', $assigment);
 
         $studentId = auth()->id();
         $assigment->load(['teacher', 'submissions' => function ($q) use ($studentId) {
@@ -109,20 +112,20 @@ class AssigementController extends Controller
 
     public function store(Request $request, Assigment $assigment)
     {
+        $this->authorize('submit', $assigment);
+
         $student = auth()->user();
 
-        $this->authorizeStudentForAssignment($assigment);
-
         $request->validate([
-            'file' => 'required|file|mimes:pdf,doc,docx,zip|max:10240',
+            'file' => ['required', 'file', 'max:10240', new SecureFileUpload],
             'note' => 'nullable|string|max:500',
         ]);
 
         $existingSubmission = $assigment->submissions()->where('assigment_id', $assigment->id)
-            ->where('student_id',  $student->id)
+            ->where('student_id', $student->id)
             ->first();
 
-        if($existingSubmission) {
+        if ($existingSubmission) {
             return redirect()->back()->with('error', 'Anda sudah mengirimkan tugas ini');
         }
 
@@ -130,10 +133,14 @@ class AssigementController extends Controller
             DB::beginTransaction();
 
             $file = $request->file('file');
-            $fillName = time() . '_' .$file->getClientOriginalName();
+
+            // Generate secure filename using UUID
+            $extension = strtolower($file->getClientOriginalExtension());
+            $filename = Str::uuid().'.'.$extension;
+
             $path = $file->storeAs(
-                "assigements/{$assigment->id}/submissions",
-                $fillName,
+                "assignments/{$assigment->id}/submissions",
+                $filename,
                 'public'
             );
 
@@ -146,29 +153,45 @@ class AssigementController extends Controller
 
             DB::commit();
 
+            // Log successful submission
+            Log::info('Assignment submitted', [
+                'user_id' => $student->id,
+                'assignment_id' => $assigment->id,
+                'submission_id' => $submission->id,
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+            ]);
+
             return redirect()->route('siswa.assigements.success', $assigment->id)
                 ->with('success', 'Tugas berhasil dikirim');
-
         } catch (Exception $e) {
             DB::rollBack();
+
+            // Log failed submission
+            Log::error('Assignment submission failed', [
+                'user_id' => $student->id,
+                'assignment_id' => $assigment->id,
+                'error' => $e->getMessage(),
+                'ip' => $request->ip(),
+            ]);
+
             return redirect()->back()->with('error', 'Gagal mengirim tugas. Silakan coba lagi.');
         }
 
     }
 
-
     public function success(Assigment $assigment)
     {
+        $this->authorize('view', $assigment);
+
         $studentId = auth()->id();
 
         $submission = $assigment->submissions()
             ->where('student_id', $studentId)
             ->first();
-        if(!$submission) {
+        if (! $submission) {
             return redirect()->route('siswa.assigements.show', $assigment->id)->with('error', 'Tugas tidak ditemukan');
         }
-
-        $this->authorizeStudentForAssignment($assigment);
 
         return Inertia::render('Siswa/Assigement/Success', [
             'submission' => [
@@ -178,7 +201,7 @@ class AssigementController extends Controller
                 'status' => 'Berhasil dikumpulkan',
                 'score' => $submission->graded_at ? $submission->score : null,
                 'reviewStatus' => $submission->graded_at ? 'Sudah dinilai' : 'Sedang direview',
-            ]
+            ],
         ]);
     }
 }

@@ -16,17 +16,17 @@ class UserSeeder extends Seeder
         // create guru
         $guru = [
             [
-                'name' => 'Ai Somansi SPD',
+                'name' => 'Ai Somansi S.Pd',
                 'email' => 'matematika@edusmart.id',
                 'subject' => 'Matematika',
             ],
             [
-                'name' => 'Asika Mekka SPD',
+                'name' => 'Asika Mekka S.Pd',
                 'email' => 'ipa@edusmart.id',
                 'subject' => 'IPA',
             ],
             [
-                'name' => 'Burhanudin SPD',
+                'name' => 'Burhanudin S.Pd',
                 'email' => 'ips@edusmart.id',
                 'subject' => 'IPS',
             ],
@@ -35,7 +35,26 @@ class UserSeeder extends Seeder
                 'email' => 'bahasa@edusmart.id',
                 'subject' => 'Bahasa Indonesia',
             ],
-
+            [
+                'name' => 'Siti Aminah S.Pd',
+                'email' => 'biologi@edusmart.id',
+                'subject' => 'Biologi',
+            ],
+            [
+                'name' => 'Budi Santoso S.H',
+                'email' => 'ppkn@edusmart.id',
+                'subject' => 'PPKN',
+            ],
+            [
+                'name' => 'Ust. Abdul Malik S.Ag',
+                'email' => 'pai@edusmart.id',
+                'subject' => 'PAI',
+            ],
+            [
+                'name' => 'Neng Elis S.Pd',
+                'email' => 'sunda@edusmart.id',
+                'subject' => 'Bahasa Sunda',
+            ],
         ];
 
         foreach ($guru as $g) {

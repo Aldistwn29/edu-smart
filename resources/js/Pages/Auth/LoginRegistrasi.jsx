@@ -76,54 +76,55 @@ export default function LoginRegistrasi() {
                             </p>
                         </div>
                     </div>
-                    {/* Role selection */}
-                    {mode === 'login' && (
-                        <div className="mb-6">
-                            <Label className="mb-3 block text-sm font-medium">
-                                Masuk Sebagai
-                            </Label>
-                            <div className="grid grid-cols-2 gap-3">
-                                {/* Siswa */}
-                                <Button
-                                    variant="outline"
-                                    type="button"
-                                    onClick={() => setData('role', 'siswa')}
-                                    className={`h-auto flex-col items-center justify-center gap-3 rounded-xl border-2 p-6 transition-all ${
-                                        data.role == 'siswa'
-                                            ? 'border-primary bg-primary/5 text-primary'
-                                            : 'border-border text-muted-foreground hover:border-primary/50'
-                                    }`}
-                                >
-                                    <User className="h-8 w-8" />
-                                    <span className="text-base font-medium">
-                                        Siswa
-                                    </span>
-                                </Button>
-                                {/* Guru */}
-                                <Button
-                                    variant="outline"
-                                    type="button"
-                                    onClick={() => setData('role', 'guru')}
-                                    className={`h-auto flex-col items-center justify-center gap-3 rounded-xl border-2 p-6 transition-all ${
-                                        data.role == 'guru'
-                                            ? 'border-primary bg-primary/5 text-primary'
-                                            : 'border-border text-muted-foreground hover:border-primary/50'
-                                    }`}
-                                >
-                                    <BookOpen className="h-8 w-8" />
-                                    <span className="text-base font-medium">
-                                        Guru
-                                    </span>
-                                </Button>
-                            </div>
+                    {/* Role selection - Show for BOTH login and register */}
+                    <div className="mb-6">
+                        <Label className="mb-3 block text-sm font-medium">
+                            {mode === 'login'
+                                ? 'Masuk Sebagai'
+                                : 'Daftar Sebagai'}
+                        </Label>
+                        <div className="grid grid-cols-2 gap-3">
+                            {/* Siswa */}
+                            <Button
+                                variant="outline"
+                                type="button"
+                                onClick={() => setData('role', 'siswa')}
+                                className={`h-auto flex-col items-center justify-center gap-3 rounded-xl border-2 p-6 transition-all ${
+                                    data.role === 'siswa'
+                                        ? 'border-primary bg-primary/5 text-primary'
+                                        : 'border-border text-muted-foreground hover:border-primary/50'
+                                }`}
+                            >
+                                <User className="h-8 w-8" />
+                                <span className="text-base font-medium">
+                                    Siswa
+                                </span>
+                            </Button>
+                            {/* Guru */}
+                            <Button
+                                variant="outline"
+                                type="button"
+                                onClick={() => setData('role', 'guru')}
+                                className={`h-auto flex-col items-center justify-center gap-3 rounded-xl border-2 p-6 transition-all ${
+                                    data.role === 'guru'
+                                        ? 'border-primary bg-primary/5 text-primary'
+                                        : 'border-border text-muted-foreground hover:border-primary/50'
+                                }`}
+                            >
+                                <BookOpen className="h-8 w-8" />
+                                <span className="text-base font-medium">
+                                    Guru
+                                </span>
+                            </Button>
                         </div>
-                    )}
+                    </div>
                     {/* Tabs */}
                     <Tabs
                         value={mode}
                         onValueChange={(val) => {
                             setMode(val);
-                            if (val === 'signup') setData('role', 'siswa');
+                            // Reset role to siswa when switching modes
+                            setData('role', 'siswa');
                         }}
                     >
                         <TabsList className="mb-6 grid grid-cols-2">
@@ -181,7 +182,7 @@ export default function LoginRegistrasi() {
                                         type={
                                             showPassword ? 'text' : 'password'
                                         }
-                                        placeholder="Massukan password anda"
+                                        placeholder="Masukkan password anda"
                                         className="pl-10 pr-10"
                                         value={data.password}
                                         onChange={(e) =>

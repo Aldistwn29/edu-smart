@@ -19,19 +19,24 @@ class ClassRoomSeeder extends Seeder
         // Daftar kelas
         $classData = [
             ['name' => '7', 'subject' => 'Matematika'],
-            ['name' => '7', 'subject' => 'Ilmu Pengetahuan Alam'],
-            ['name' => '7', 'subject' => 'Ilmu Pengetahuan Sosial'],
-            ['name' => '7', 'subject' => 'Pendidikan Kewarganegaraan'],
-            ['name' => '7', 'subject' => 'Bahasa Indonesia'],
+            ['name' => '7', 'subject' => 'IPA'],
+            ['name' => '7', 'subject' => 'IPS'],
+            ['name' => '7', 'subject' => 'Biologi'],
+            ['name' => '7', 'subject' => 'PPKN'],
+            ['name' => '7', 'subject' => 'PAI'],
+            ['name' => '7', 'subject' => 'Bahasa Sunda'],
         ];
 
         foreach ($classData as $data) {
             // Map subjek ke email guru yang sesuai
             $teacherEmail = match ($data['subject']) {
                 'Matematika' => 'matematika@edusmart.id',
-                'Ilmu Pengetahuan Alam' => 'ipa@edusmart.id',
-                'Ilmu Pengetahuan Sosial' => 'ips@edusmart.id',
-                'Bahasa Indonesia' => 'bahasa@edusmart.id',
+                'IPA' => 'ipa@edusmart.id',
+                'IPS' => 'ips@edusmart.id',
+                'Biologi' => 'biologi@edusmart.id',
+                'PPKN' => 'ppkn@edusmart.id',
+                'PAI' => 'pai@edusmart.id',
+                'Bahasa Sunda' => 'sunda@edusmart.id',
                 default => 'matematika@edusmart.id',
             };
 

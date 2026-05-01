@@ -7,6 +7,7 @@ use App\Http\Controllers\Guru\MateriController;
 use App\Http\Controllers\Guru\QuizController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Siswa\AssigementController;
+use App\Http\Controllers\Siswa\ChatbotAi;
 use App\Http\Controllers\Siswa\ClassRoomController as SiswaClassRoomController;
 use App\Http\Controllers\Siswa\MateriController as SiswaMateriController;
 use App\Http\Controllers\Siswa\QuizController as SiswaQuizController;
@@ -25,7 +26,17 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
+    $user = auth()->user();
+
+    if ($user->role === 'guru') {
+        return redirect()->route('guru.dashboard');
+    }
+
+    if ($user->role === 'siswa') {
+        return redirect()->route('siswa.dashboard');
+    }
+
+    return redirect('/');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -87,7 +98,9 @@ Route::middleware(['role:siswa'])->prefix('siswa')->name('siswa.')->group(functi
     // Quiz
     Route::get('/quizzes', [SiswaQuizController::class, 'index'])->name('quizzes.index');
     Route::get('/quizzes/{quiz}/take', [SiswaQuizController::class, 'show'])->name('quizzes.show');
-    Route::post('/quizzes/{quiz}/submit', [SiswaQuizController::class, 'submit'])->name('quizzes.submit');
+    Route::post('/quizzes/{quiz}/submit', [SiswaQuizController::class, 'submit'])
+        ->middleware('throttle:quiz-submissions')
+        ->name('quizzes.submit');
     Route::get('/quizzes/{quiz}/result', [SiswaQuizController::class, 'result'])->name('quizzes.result');
 
     // Materi
@@ -98,7 +111,13 @@ Route::middleware(['role:siswa'])->prefix('siswa')->name('siswa.')->group(functi
     // Penugasan
     Route::get('/assigements', [AssigementController::class, 'index'])->name('assigements.index');
     Route::get('/assigements/{assigment}/show', [AssigementController::class, 'show'])->name('assigements.show');
-    Route::post('/assigements/{assigment}/submit', [AssigementController::class, 'store'])->name('assigements.submit');
+    Route::post('/assigements/{assigment}/submit', [AssigementController::class, 'store'])
+        ->middleware('throttle:uploads')
+        ->name('assigements.submit');
     Route::get('/assigements/{assigment}/success', [AssigementController::class, 'success'])->name('assigements.success');
+
+    // Chatbot
+    Route::get('/chatbot', [ChatbotAi::class, 'index'])->name('chatbotai.index');
+    Route::post('/chatbot/generate', [ChatbotAi::class, 'generate'])->name('chatbotai.generate');
 });
 require __DIR__.'/auth.php';
