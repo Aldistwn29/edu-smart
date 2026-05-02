@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers\Siswa;
 
-use App\Http\Controllers\Controller;
 use App\Services\LearningAnalysisService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
-class ChatbotAi extends Controller
+class ChatbotAi
 {
     protected $learningAnalysisService;
 

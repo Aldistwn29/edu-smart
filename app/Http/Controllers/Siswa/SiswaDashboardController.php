@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Siswa;
 
-use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\ClassRoom;
 use App\Models\Material;
@@ -11,50 +10,71 @@ use App\Models\QuizAttempt;
 use App\Models\Quize;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Inertia\Response;
 
-class SiswaDashboardController extends Controller
+class SiswaDashboardController
 {
-    public function dashboard()
+    public function dashboard(): Response
     {
         $user = Auth::user();
-        $student_id = $user->id;
+        $studentId = $user->id;
 
-        // Statistika umum
-        $totalMaterialsEnrolled = Material::whereIn('class_id', function ($query) use ($student_id) {
-            $query->select('class_room_id')->from('classroom_user')->where('user_id', $student_id);
-        })->count();
-        $completedMaterialsCount = MateriProgres::where('student_id', $student_id)
+        // Ambil ID kelas yang diikuti siswa untuk efisiensi
+        $enrolledClassIds = $user->enrolledClasses()->pluck('class_rooms.id');
+
+        // Statistika umum menggunakan ID kelas yang sudah ada
+        $totalMaterialsEnrolled = Material::query()
+            ->whereIn('class_id', $enrolledClassIds)
+            ->count();
+
+        $completedMaterialsCount = MateriProgres::query()
+            ->where('student_id', $studentId)
             ->where('is_completed', true)
+            ->count();
+
+        $enrolledQuizCount = Quize::query()
+            ->whereIn('class_id', $enrolledClassIds)
+            ->count();
+
+        $completedQuizCount = QuizAttempt::query()
+            ->where('student_id', $studentId)
+            ->whereNotNull('end_date')
             ->count();
 
         $stats = [
             'materi_selesai' => "$completedMaterialsCount/$totalMaterialsEnrolled",
-            'quiz_dikerjakan' => QuizAttempt::where('student_id', $student_id)->distinct('quiz_id')->count().'/'.Quize::whereIn('class_id', function ($query) use ($student_id) {
-                $query->select('class_room_id')->from('classroom_user')->where('user_id', $student_id);
-            })->count(),
-            'nilai_rata_rata' => round(QuizAttempt::where('student_id', $student_id)->avg('score') ?? 0),
-            'jam_belajar' => ActivityLog::where('user_id', $student_id)->count(),
+            'quiz_dikerjakan' => "$completedQuizCount/$enrolledQuizCount",
+            'nilai_rata_rata' => (int) round(QuizAttempt::query()
+                ->where('student_id', $studentId)
+                ->whereNotNull('end_date')
+                ->avg('score') ?? 0),
+            'jam_belajar' => ActivityLog::query()->where('user_id', $studentId)->count(),
         ];
 
-        // Progress belajar
-        $progress_belajar = ClassRoom::whereHas('students', fn ($q) => $q->where('users.id', $student_id))
+        // Progress belajar per kelas
+        $progressBelajar = ClassRoom::query()
+            ->whereIn('id', $enrolledClassIds)
             ->withCount('materials')
             ->get()
-            ->map(function ($class) use ($student_id) {
+            ->map(function ($class) use ($studentId) {
                 $totalClassMaterials = $class->materials_count;
-                $completedInClass = MateriProgres::where('student_id', $student_id)
-                    ->whereIn('material_id', $class->materials->pluck('id'))
+
+                // Menghitung materi yang selesai di kelas ini
+                $completedInClass = MateriProgres::query()
+                    ->where('student_id', $studentId)
+                    ->whereIn('material_id', $class->materials()->pluck('id'))
                     ->where('is_completed', true)
                     ->count();
 
                 $percentage = $totalClassMaterials > 0
-                    ? round(($completedInClass / $totalClassMaterials) * 100)
+                    ? (int) round(($completedInClass / $totalClassMaterials) * 100)
                     : 0;
 
                 return [
                     'id' => $class->id,
                     'subject' => $class->subject,
-                    'last_activity' => ActivityLog::where('user_id', $student_id)
+                    'last_activity' => ActivityLog::query()
+                        ->where('user_id', $studentId)
                         ->where('subject_name', $class->subject)
                         ->latest()
                         ->first()?->created_at->diffForHumans() ?? 'Belum ada aktivitas',
@@ -63,7 +83,8 @@ class SiswaDashboardController extends Controller
             });
 
         // Quiz terakhir
-        $quiz_terakhir = QuizAttempt::where('student_id', $student_id)
+        $quizTerakhir = QuizAttempt::query()
+            ->where('student_id', $studentId)
             ->with(['quiz.classroom'])
             ->latest()
             ->take(5)
@@ -78,8 +99,8 @@ class SiswaDashboardController extends Controller
 
         return Inertia::render('Siswa/Dashboard', [
             'stats' => $stats,
-            'progress_belajar' => $progress_belajar,
-            'quiz_terakhir' => $quiz_terakhir,
+            'progress_belajar' => $progressBelajar,
+            'quiz_terakhir' => $quizTerakhir,
         ]);
     }
 }

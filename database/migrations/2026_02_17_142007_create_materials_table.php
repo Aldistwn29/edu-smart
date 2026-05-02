@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('teacher_id')->constrained('users')->cascadeOnDelete();
 
             $table->string('title');
+            $table->string('content')->nullable();
             $table->text('description')->nullable();
             $table->enum('type', ['video', 'link', 'file', 'text']);
             $table->string('file_path')->nullable();

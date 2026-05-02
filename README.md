@@ -1,66 +1,124 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Edusmart - Modern Learning Management System (LMS)
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="300" alt="Laravel Logo">
 </p>
 
-## About Laravel
+Edusmart adalah platform sistem manajemen pembelajaran (LMS) modern yang dirancang untuk memfasilitasi interaksi antara Guru dan Siswa secara digital. Dibangun dengan fokus pada kemudahan penggunaan, keamanan data, dan integrasi kecerdasan buatan (AI).
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🚀 Teknologi Utama
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Proyek ini dibangun menggunakan teknologi mutakhir dalam ekosistem web:
 
-## Learning Laravel
+*   **Core Framework**: [Laravel 11](https://laravel.com) (PHP 8.3+)
+*   **Frontend Bridge**: [Inertia.js v2](https://inertiajs.com)
+*   **Frontend Library**: [React 18](https://reactjs.org)
+*   **Styling**: [Tailwind CSS v3](https://tailwindcss.com)
+*   **State Management**: Inertia Form Helpers & React Hooks
+*   **AI Integration**: [Google Gemini AI](https://ai.google.dev/) (via Gemini Laravel SDK)
+*   **Icons**: Lucide React & Radix UI Components
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## ✨ Fitur Unggulan
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 👨‍🏫 Panel Guru (Teacher Panel)
+*   **Manajemen Kelas**: Membuat dan mengelola ruang kelas digital.
+*   **Materi Belajar**: Mengunggah materi dalam berbagai format dengan progres siswa yang terpantau.
+*   **Sistem Kuis**: Pembuat kuis interaktif (Pilihan Ganda & Benar/Salah) dengan pengaturan deadline otomatis.
+*   **Analisis Aktivitas**: Memantau partisipasi siswa melalui log aktivitas sistematis.
+*   **Keamanan**: Implementasi Policy-based authorization untuk setiap sumber daya kelas.
 
-## Laravel Sponsors
+### 👨‍🎓 Panel Siswa (Student Panel)
+*   **Dashboard Progres**: Visualisasi pencapaian materi, kuis, dan rata-rata nilai secara real-time.
+*   **Ujian Online**: Antarmuka pengerjaan kuis yang bersih dengan timer otomatis.
+*   **AI Chatbot**: Asisten pintar Edusmart AI untuk membantu analisis akademik siswa.
+*   **Log Aktivitas**: Riwayat belajar yang tercatat rapi untuk evaluasi mandiri.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+---
 
-### Premium Partners
+## 🛠️ Persyaratan Sistem
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+Sebelum memulai, pastikan perangkat Anda memenuhi persyaratan berikut:
+*   PHP >= 8.3
+*   Composer >= 2.x
+*   Node.js >= 20.x & NPM
+*   MySQL 8.0+ atau PostgreSQL
+*   Browser modern (Chrome, Edge, Firefox)
 
-## Contributing
+---
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 📦 Instalasi Proyek
 
-## Code of Conduct
+Ikuti langkah-langkah berikut untuk menjalankan Edusmart di lingkungan lokal Anda:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+1.  **Clone Repository**
+    ```bash
+    git clone https://github.com/Aldistwn29/Edusmart.git
+    cd Edusmart
+    ```
 
-## Security Vulnerabilities
+2.  **Instal Dependensi PHP**
+    ```bash
+    composer install
+    ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+3.  **Instal Dependensi Frontend**
+    ```bash
+    npm install
+    ```
 
-## License
+4.  **Konfigurasi Environment**
+    ```bash
+    cp .env.example .env
+    php artisan key:generate
+    ```
+    *Sesuaikan koneksi database dan `GEMINI_API_KEY` di file `.env`.*
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+5.  **Migrasi & Database Seeding**
+    ```bash
+    php artisan migrate --seed
+    ```
+
+6.  **Menjalankan Server**
+    ```bash
+    # Terminal 1 (Laravel Server)
+    php artisan serve
+
+    # Terminal 2 (Vite HMR)
+    npm run dev
+    ```
+
+---
+
+## 🧹 Perawatan Kode (Maintenance)
+
+Proyek ini menjaga standar kode yang tinggi menggunakan tools berikut:
+
+*   **Laravel Pint**: Menjaga konsistensi gaya penulisan PSR-12.
+    ```bash
+    vendor/bin/pint
+    ```
+*   **IDE Helper**: Membantu autocompletion pada editor (VS Code).
+    ```bash
+    php artisan ide-helper:generate
+    php artisan ide-helper:models --nowrite
+    ```
+
+---
+
+## 🔒 Keamanan
+
+Aplikasi ini menerapkan standar keamanan ketat:
+*   **CSRF Protection**: Aktif secara default via Laravel.
+*   **Secure File Uploads**: Validasi mimetype dan ukuran file yang ketat.
+*   **Role-based Access Control (RBAC)**: Menggunakan Laravel Gate dan Policy.
+*   **Sanitized Data**: Seluruh input divalidasi via Form Requests.
+
+---
+
+## 📄 Lisensi
+
+Proyek ini bersifat open-source di bawah lisensi [MIT](LICENSE).

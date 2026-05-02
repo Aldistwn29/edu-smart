@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers\Guru;
 
-use App\Http\Controllers\Controller;
 use App\Models\ClassRoom;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
+use Inertia\Response;
 
-class ClassRoomController extends Controller
+class ClassRoomController
 {
-    public function index()
+    public function index(): Response
     {
         $classrooms = Auth::user()->teachingClasses()
             ->withCount('students')
@@ -22,8 +24,10 @@ class ClassRoomController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
+        Gate::authorize('create', ClassRoom::class);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'subject' => 'required|string|max:255',
@@ -34,15 +38,12 @@ class ClassRoomController extends Controller
         // generate code
         Auth::user()->teachingClasses()->create($validated);
 
-        return back()->with('succes', 'Kelas berhasil dibuat');
+        return back()->with('success', 'Kelas berhasil dibuat');
     }
 
-    public function show(ClassRoom $classRoom)
+    public function show(ClassRoom $classRoom): Response
     {
-        // hanya guru yang bisa akses
-        if ($classRoom->teacher_id != Auth::user()->id) {
-            abort(403);
-        }
+        Gate::authorize('view', $classRoom);
 
         // Load classroom with student counts
         $classRoom->loadCount(['students', 'materials', 'quizzes'])->load([
@@ -74,12 +75,9 @@ class ClassRoomController extends Controller
         ]);
     }
 
-    public function destroy(ClassRoom $classRoom)
+    public function destroy(ClassRoom $classRoom): RedirectResponse
     {
-        // Hanya guru pemilik kelas yang bisa menghapus
-        if ($classRoom->teacher_id != Auth::id()) {
-            abort(403);
-        }
+        Gate::authorize('delete', $classRoom);
 
         $classRoom->delete();
 

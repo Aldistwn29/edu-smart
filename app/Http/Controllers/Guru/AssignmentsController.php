@@ -2,26 +2,28 @@
 
 namespace App\Http\Controllers\Guru;
 
-use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\Assigment;
 use App\Models\AssigmentSubmission;
 use App\Models\ClassRoom;
 use App\Models\Material;
 use App\Rules\SecureFileUpload;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Inertia\Response;
 
-class AssignmentsController extends Controller
+class AssignmentsController
 {
-    public function index()
+    public function index(): Response
     {
         $teacherId = Auth::id();
 
-        $assigements = Assigment::where('teacher_id', $teacherId)
+        $assigements = Assigment::query()->where('teacher_id', $teacherId)
             ->with(['classroom' => function ($query) {
                 $query->withCount('students');
             }])
@@ -30,11 +32,11 @@ class AssignmentsController extends Controller
             ->paginate(10);
 
         $stats = [
-            'total_assigements' => Assigment::where('teacher_id', $teacherId)->count(),
-            'total_submissions' => AssigmentSubmission::whereHas('assigment', function ($query) use ($teacherId) {
+            'total_assigements' => Assigment::query()->where('teacher_id', $teacherId)->count(),
+            'total_submissions' => AssigmentSubmission::query()->whereHas('assigment', function ($query) use ($teacherId) {
                 $query->where('teacher_id', $teacherId);
             })->count(),
-            'avg_score' => number_format(AssigmentSubmission::whereHas('assigment', function ($query) use ($teacherId) {
+            'avg_score' => number_format(AssigmentSubmission::query()->whereHas('assigment', function ($query) use ($teacherId) {
                 $query->where('teacher_id', $teacherId);
             })->avg('score') ?? 0, 1),
         ];
@@ -45,16 +47,20 @@ class AssignmentsController extends Controller
         ]);
     }
 
-    public function create()
+    public function create(): Response
     {
+        Gate::authorize('create', Assigment::class);
+
         return Inertia::render('Guru/Assigement/Create', [
-            'classrooms' => ClassRoom::where('teacher_id', Auth::id())->get(),
-            'materials' => Material::where('teacher_id', Auth::id())->get(),
+            'classrooms' => ClassRoom::query()->where('teacher_id', Auth::id())->get(),
+            'materials' => Material::query()->where('teacher_id', Auth::id())->get(),
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
+        Gate::authorize('create', Assigment::class);
+
         $validated = $request->validate([
             'class_id' => 'required|exists:class_rooms,id',
             'material_id' => 'nullable|exists:materials,id',
@@ -74,7 +80,7 @@ class AssignmentsController extends Controller
             $validated['attachment_path'] = $path;
         }
 
-        $assigment = Assigment::create([
+        $assigment = Assigment::query()->create([
             'teacher_id' => Auth::id(),
             'class_id' => $validated['class_id'],
             'material_id' => $validated['material_id'],
@@ -85,11 +91,11 @@ class AssignmentsController extends Controller
             'attachment_path' => $validated['attachment_path'] ?? null,
         ]);
 
-        ActivityLog::create([
+        ActivityLog::query()->create([
             'user_id' => Auth::id(),
             'action_type' => 'create',
             'description' => 'Menambahkan tugas baru: '.$assigment->title,
-            'subject_name' => $assigment->classroom->name,
+            'subject_name' => $assigment->classroom->name ?? 'N/A',
             'loggable_id' => $assigment->id,
             'loggable_type' => Assigment::class,
         ]);
@@ -97,20 +103,20 @@ class AssignmentsController extends Controller
         return redirect()->route('guru.assigments.index')->with('success', 'Tugas Berhasil diterbitkan!');
     }
 
-    public function edit(Assigment $assigment)
+    public function edit(Assigment $assigment): Response
     {
-        $this->authorize('update', $assigment);
+        Gate::authorize('update', $assigment);
 
         return Inertia::render('Guru/Assigement/Edit', [
             'assigment' => $assigment,
-            'classrooms' => ClassRoom::where('teacher_id', Auth::id())->get(),
-            'materials' => Material::where('teacher_id', Auth::id())->get(),
+            'classrooms' => ClassRoom::query()->where('teacher_id', Auth::id())->get(),
+            'materials' => Material::query()->where('teacher_id', Auth::id())->get(),
         ]);
     }
 
-    public function update(Request $request, Assigment $assigment)
+    public function update(Request $request, Assigment $assigment): RedirectResponse
     {
-        $this->authorize('update', $assigment);
+        Gate::authorize('update', $assigment);
 
         $validated = $request->validate([
             'class_id' => 'required|exists:class_rooms,id',
@@ -146,11 +152,11 @@ class AssignmentsController extends Controller
             'attachment_path' => $validated['attachment_path'] ?? $assigment->attachment_path,
         ]);
 
-        ActivityLog::create([
+        ActivityLog::query()->create([
             'user_id' => Auth::id(),
             'action_type' => 'update',
             'description' => 'Memperbaharui tugas: '.$assigment->title,
-            'subject_name' => $assigment->classroom->name,
+            'subject_name' => $assigment->classroom->name ?? 'N/A',
             'loggable_id' => $assigment->id,
             'loggable_type' => Assigment::class,
         ]);
@@ -158,14 +164,14 @@ class AssignmentsController extends Controller
         return redirect()->route('guru.assigments.index')->with('success', 'Tugas Berhasil diperbaharui!');
     }
 
-    public function submissions(Assigment $assigment)
+    public function submissions(Assigment $assigment): Response
     {
-        $this->authorize('view', $assigment);
+        Gate::authorize('view', $assigment);
 
         $assigment->load(['classroom.students']);
 
         $submissions = $assigment->classroom->students->map(function ($student) use ($assigment) {
-            $submission = AssigmentSubmission::where('assigment_id', $assigment->id)
+            $submission = AssigmentSubmission::query()->where('assigment_id', $assigment->id)
                 ->where('student_id', $student->id)
                 ->first();
 
@@ -181,9 +187,9 @@ class AssignmentsController extends Controller
         ]);
     }
 
-    public function grade(Request $request, AssigmentSubmission $submission)
+    public function grade(Request $request, AssigmentSubmission $submission): RedirectResponse
     {
-        $this->authorize('grade', $submission->assigment);
+        Gate::authorize('grade', $submission->assigment);
 
         $validated = $request->validate([
             'score' => 'required|numeric|min:0|max:100',
@@ -196,11 +202,11 @@ class AssignmentsController extends Controller
             'graded_at' => now(),
         ]);
 
-        ActivityLog::create([
+        ActivityLog::query()->create([
             'user_id' => Auth::id(),
             'action_type' => 'grade',
             'description' => 'Memberikan nilai untuk tugas: '.$submission->assigment->title.' kepada '.$submission->student->name,
-            'subject_name' => $submission->assigment->classroom->name,
+            'subject_name' => $submission->assigment->classroom->name ?? 'N/A',
             'loggable_id' => $submission->id,
             'loggable_type' => AssigmentSubmission::class,
         ]);
@@ -208,9 +214,9 @@ class AssignmentsController extends Controller
         return redirect()->back()->with('success', 'Penilaian berhasil disimpan!');
     }
 
-    public function destroy(Assigment $assigment)
+    public function destroy(Assigment $assigment): RedirectResponse
     {
-        $this->authorize('delete', $assigment);
+        Gate::authorize('delete', $assigment);
 
         // Delete attachment if exists
         if ($assigment->attachment_path) {
@@ -218,11 +224,11 @@ class AssignmentsController extends Controller
         }
 
         $title = $assigment->title;
-        $classroomName = $assigment->classroom->name;
+        $classroomName = $assigment->classroom->name ?? 'N/A';
 
         $assigment->delete();
 
-        ActivityLog::create([
+        ActivityLog::query()->create([
             'user_id' => Auth::id(),
             'action_type' => 'delete',
             'description' => 'Menghapus tugas: '.$title,

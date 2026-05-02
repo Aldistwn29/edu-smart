@@ -115,8 +115,8 @@ export default function Index({ materials, filters = {} }) {
                                                     <div className="flex items-center gap-2">
                                                         <Badge className="rounded-full border-none bg-secondary px-3 text-[10px] font-black uppercase tracking-wider text-secondary-foreground">
                                                             {item.classroom
-                                                                ?.name ||
-                                                                'Umum'}
+                                                                ? (item.classroom.subject ? `${item.classroom.subject} - ${item.classroom.name}` : item.classroom.name)
+                                                                : 'Umum'}
                                                         </Badge>
                                                         <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
                                                             • {item.type}

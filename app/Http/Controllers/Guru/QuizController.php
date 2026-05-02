@@ -2,43 +2,47 @@
 
 namespace App\Http\Controllers\Guru;
 
-use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\ClassRoom;
 use App\Models\QuizAttempt;
 use App\Models\Quize;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use Inertia\Response;
 
-class QuizController extends Controller
+class QuizController
 {
-    public function index()
+    public function index(): Response
     {
-        $teacher_id = Auth::id();
+        $teacherId = Auth::id();
 
         $stats = [
-            'total_quizes' => Quize::where('teacher_id', $teacher_id)->count(),
+            'total_quizes' => Quize::query()->where('teacher_id', $teacherId)->count(),
             // Mengitung siswa yang belum submit quiz
-            'unsubmitted_students' => Quize::where('teacher_id', $teacher_id)
+            'unsubmitted_students' => Quize::query()->where('teacher_id', $teacherId)
                 ->with(['classroom' => function ($query) {
                     $query->withCount('students');
                 }])
                 ->withCount('attempts')
                 ->get()
                 ->sum(function ($quiz) {
-                    $student_count = $quiz->classroom ? $quiz->classroom->students_count : 0;
+                    $studentCount = $quiz->classroom ? $quiz->classroom->students_count : 0;
 
-                    return max(0, $student_count - $quiz->attempts_count);
+                    return max(0, $studentCount - $quiz->attempts_count);
                 }),
-            'avg_score' => round(QuizAttempt::whereHas('quiz', function ($q) use ($teacher_id) {
-                $q->where('teacher_id', $teacher_id);
+            'avg_score' => (int) round(QuizAttempt::query()->whereHas('quiz', function ($q) use ($teacherId) {
+                $q->where('teacher_id', $teacherId);
             })->avg('score') ?? 0),
         ];
 
         // Logik daftar quiz dengan progress
-        $quizzes = Quize::where('teacher_id', $teacher_id)
+        $quizzes = Quize::query()->where('teacher_id', $teacherId)
             ->with(['classroom' => function ($query) {
                 $query->withCount('students');
             }])
@@ -47,7 +51,7 @@ class QuizController extends Controller
             ->paginate(5)
             ->through(function ($quiz) {
                 // Menghitung total siswa di kelas quiz tersebut
-                $total_students = $quiz->classroom ? $quiz->classroom->students_count : 0;
+                $totalStudents = $quiz->classroom ? $quiz->classroom->students_count : 0;
 
                 return [
                     'id' => $quiz->id,
@@ -55,9 +59,9 @@ class QuizController extends Controller
                     'description' => $quiz->description,
                     'classroom_name' => $quiz->classroom ? $quiz->classroom->name : 'N/A',
                     'completed_count' => $quiz->attempts_count,
-                    'total_students' => $total_students,
-                    'remaining_days' => Carbon::parse($quiz->deadline)->isPast() ? 0 : (int) round(Carbon::parse($quiz->deadline)->diffInDays(now())),
-                    'is_active' => Carbon::parse($quiz->deadline)->isFuture(),
+                    'total_students' => $totalStudents,
+                    'remaining_days' => $quiz->deadline->isPast() ? 0 : (int) round($quiz->deadline->diffInDays(now())),
+                    'is_active' => $quiz->deadline->isFuture(),
                 ];
             });
 
@@ -67,9 +71,11 @@ class QuizController extends Controller
         ]);
     }
 
-    public function create()
+    public function create(): Response
     {
-        $classrooms = ClassRoom::where('teacher_id', Auth::id())
+        Gate::authorize('create', Quize::class);
+
+        $classrooms = ClassRoom::query()->where('teacher_id', Auth::id())
             ->get(['id', 'name']);
 
         return Inertia::render('Guru/Quiz/Create', [
@@ -77,8 +83,10 @@ class QuizController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
+        Gate::authorize('create', Quize::class);
+
         $request->validate([
             'class_id' => 'required|exists:class_rooms,id',
             'title' => 'required|string|max:255',
@@ -95,49 +103,68 @@ class QuizController extends Controller
             'questions.*.options.*.is_correct' => 'required',
         ]);
 
-        $deadline = Carbon::parse($request->deadline_date.' '.$request->deadline_time);
+        try {
+            DB::beginTransaction();
 
-        $quiz = Quize::create([
-            'class_id' => $request->class_id,
-            'teacher_id' => Auth::id(),
-            'title' => $request->title,
-            'description' => $request->description,
-            'duration_minutes' => $request->duration_minutes,
-            'deadline' => $deadline,
-        ]);
+            $deadline = Carbon::parse($request->deadline_date.' '.$request->deadline_time);
 
-        foreach ($request->questions as $index => $q) {
-            // Deteksi jawaban benar dengan lebih fleksibel (boolean/string/int)
-            $correct_option = collect($q['options'])->first(function ($opt) {
-                return $opt['is_correct'] === true || $opt['is_correct'] === 1 || $opt['is_correct'] === '1' || $opt['is_correct'] === 'true' || $opt['is_correct'] === 'on';
-            });
-            $correct_answer = $correct_option['option_text'] ?? '';
-
-            $quiz->questions()->create([
-                'question' => $q['text'],
-                'type' => $q['type'],
-                'options' => $q['options'],
-                'answer' => $correct_answer,
-                'points' => $q['points'],
-                'order' => $index + 1,
+            $quiz = Quize::query()->create([
+                'class_id' => $request->class_id,
+                'teacher_id' => Auth::id(),
+                'title' => $request->title,
+                'description' => $request->description,
+                'duration_minutes' => $request->duration_minutes,
+                'deadline' => $deadline,
             ]);
+
+            foreach ($request->questions as $index => $q) {
+                // Deteksi jawaban benar dengan lebih fleksibel
+                $correctOption = collect($q['options'])->first(function ($opt) {
+                    $isCorrect = $opt['is_correct'];
+
+                    return $isCorrect === true || $isCorrect === 1 || $isCorrect === '1' || $isCorrect === 'true' || $isCorrect === 'on';
+                });
+
+                $correctAnswer = $correctOption['option_text'] ?? '';
+
+                $quiz->questions()->create([
+                    'question' => $q['text'],
+                    'type' => $q['type'],
+                    'options' => $q['options'],
+                    'answer' => $correctAnswer,
+                    'points' => $q['points'],
+                    'order' => $index + 1,
+                ]);
+            }
+
+            ActivityLog::query()->create([
+                'user_id' => Auth::id(),
+                'action_type' => 'create',
+                'description' => 'Membuat kuis baru: '.$quiz->title,
+                'subject_name' => $quiz->classroom->name ?? 'N/A',
+                'loggable_id' => $quiz->id,
+                'loggable_type' => Quize::class,
+            ]);
+
+            DB::commit();
+
+            return redirect()->route('guru.quizes.index')->with('success', 'Quiz berhasil dibuat');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Gagal membuat quiz: '.$e->getMessage(), [
+                'teacher_id' => Auth::id(),
+                'request' => $request->all(),
+            ]);
+
+            return back()->withInput()->with('error', 'Gagal membuat quiz. Silakan coba lagi.');
         }
-
-        ActivityLog::create([
-            'user_id' => Auth::id(),
-            'action_type' => 'create',
-            'description' => 'Membuat kuis baru: '.$quiz->title,
-            'subject_name' => $quiz->classroom->name,
-            'loggable_id' => $quiz->id,
-            'loggable_type' => Quize::class,
-        ]);
-
-        return redirect()->route('guru.quizes.index')->with('success', 'Quiz berhasil dibuat');
     }
 
-    public function edit(Quize $quiz)
+    public function edit(Quize $quiz): Response
     {
-        $classrooms = ClassRoom::where('teacher_id', Auth::id())
+        Gate::authorize('update', $quiz);
+
+        $classrooms = ClassRoom::query()->where('teacher_id', Auth::id())
             ->get(['id', 'name']);
         $quiz->load('questions');
 
@@ -147,8 +174,10 @@ class QuizController extends Controller
         ]);
     }
 
-    public function update(Request $request, Quize $quiz)
+    public function update(Request $request, Quize $quiz): RedirectResponse
     {
+        Gate::authorize('update', $quiz);
+
         $request->validate([
             'class_id' => 'required|exists:class_rooms,id',
             'title' => 'required|string|max:255',
@@ -166,58 +195,76 @@ class QuizController extends Controller
             'questions.*.options.*.is_correct' => 'required',
         ]);
 
-        $deadline = Carbon::parse($request->deadline_date.' '.$request->deadline_time);
-        $quiz->update([
-            'class_id' => $request->class_id,
-            'title' => $request->title,
-            'description' => $request->description,
-            'duration_minutes' => $request->duration_minutes,
-            'deadline' => $deadline,
-        ]);
+        try {
+            DB::beginTransaction();
 
-        $quiz->questions()->delete();
-
-        foreach ($request->questions as $index => $q) {
-            $correct_option = collect($q['options'])->first(function ($opt) {
-                return $opt['is_correct'] === true || $opt['is_correct'] === 1 || $opt['is_correct'] === '1' || $opt['is_correct'] === 'true' || $opt['is_correct'] === 'on';
-            });
-            $correct_answer = $correct_option['option_text'] ?? '';
-
-            $quiz->questions()->create([
-                'question' => $q['text'],
-                'type' => $q['type'],
-                'options' => $q['options'],
-                'answer' => $correct_answer,
-                'points' => $q['points'],
-                'order' => $index + 1,
+            $deadline = Carbon::parse($request->deadline_date.' '.$request->deadline_time);
+            $quiz->update([
+                'class_id' => $request->class_id,
+                'title' => $request->title,
+                'description' => $request->description,
+                'duration_minutes' => $request->duration_minutes,
+                'deadline' => $deadline,
             ]);
+
+            $quiz->questions()->delete();
+
+            foreach ($request->questions as $index => $q) {
+                $correctOption = collect($q['options'])->first(function ($opt) {
+                    $isCorrect = $opt['is_correct'];
+
+                    return $isCorrect === true || $isCorrect === 1 || $isCorrect === '1' || $isCorrect === 'true' || $isCorrect === 'on';
+                });
+                $correctAnswer = $correctOption['option_text'] ?? '';
+
+                $quiz->questions()->create([
+                    'question' => $q['text'],
+                    'type' => $q['type'],
+                    'options' => $q['options'],
+                    'answer' => $correctAnswer,
+                    'points' => $q['points'],
+                    'order' => $index + 1,
+                ]);
+            }
+
+            ActivityLog::query()->create([
+                'user_id' => Auth::id(),
+                'action_type' => 'update',
+                'description' => 'Memperbarui kuis: '.$quiz->title,
+                'subject_name' => $quiz->classroom->name ?? 'N/A',
+                'loggable_id' => $quiz->id,
+                'loggable_type' => Quize::class,
+            ]);
+
+            DB::commit();
+
+            return redirect()->route('guru.quizes.index')->with('success', 'Quiz berhasil diupdate');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Gagal mengupdate quiz: '.$e->getMessage(), [
+                'quiz_id' => $quiz->id,
+                'teacher_id' => Auth::id(),
+            ]);
+
+            return back()->with('error', 'Gagal mengupdate quiz. Silakan coba lagi.');
         }
-
-        ActivityLog::create([
-            'user_id' => Auth::id(),
-            'action_type' => 'update',
-            'description' => 'Memperbarui kuis: '.$quiz->title,
-            'subject_name' => $quiz->classroom->name,
-            'loggable_id' => $quiz->id,
-            'loggable_type' => Quize::class,
-        ]);
-
-        return redirect()->route('guru.quizes.index')->with('success', 'Quiz berhasil diupdate');
     }
 
-    public function show(Quize $quiz)
+    public function show(Quize $quiz): Response
     {
+        Gate::authorize('view', $quiz);
+
         $quiz->load(['classroom.students', 'questions']);
 
-        $attempts = QuizAttempt::where('quiz_id', $quiz->id)
+        $attempts = QuizAttempt::query()->where('quiz_id', $quiz->id)
             ->with(['student', 'answers.question'])
             ->latest()
             ->get();
 
         // Map students who haven't attempted yet
-        $submitted_student_ids = $attempts->pluck('student_id')->toArray();
-        $unsubmitted_students = $quiz->classroom->students->filter(function ($student) use ($submitted_student_ids) {
-            return ! in_array($student->id, $submitted_student_ids);
+        $submittedStudentIds = $attempts->pluck('student_id')->toArray();
+        $unsubmittedStudents = $quiz->classroom->students->filter(function ($student) use ($submittedStudentIds) {
+            return ! in_array($student->id, $submittedStudentIds);
         });
 
         return Inertia::render('Guru/Quiz/Show', [
@@ -227,13 +274,15 @@ class QuizController extends Controller
         ]);
     }
 
-    public function destroy(Quize $quiz)
+    public function destroy(Quize $quiz): RedirectResponse
     {
-        ActivityLog::create([
+        Gate::authorize('delete', $quiz);
+
+        ActivityLog::query()->create([
             'user_id' => Auth::id(),
             'action_type' => 'delete',
             'description' => 'Menghapus kuis: '.$quiz->title,
-            'subject_name' => $quiz->classroom->name,
+            'subject_name' => $quiz->classroom->name ?? 'N/A',
             'loggable_id' => $quiz->id,
             'loggable_type' => Quize::class,
         ]);

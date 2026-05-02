@@ -2,21 +2,32 @@
 
 namespace App\Http\Controllers\Siswa;
 
-use App\Http\Controllers\Controller;
 use App\Models\Material;
 use App\Models\MateriProgres;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Inertia\Response;
 
-class MateriController extends Controller
+class MateriController
 {
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
-        $query = Material::with(['teacher', 'classroom'])->where('status', 'published');
+        $classIds = Auth::user()->enrolledClasses()->pluck('class_rooms.id');
+
+        $query = Material::query()->with(['teacher', 'classroom'])
+            ->where(function ($q) use ($classIds) {
+                $q->whereIn('class_id', $classIds)->orWhereNull('class_id');
+            })
+            ->where('status', 'published');
 
         if ($request->filled('search')) {
-            $query->where('title', 'like', '%'.$request->search.'%');
+            $query->where(function ($q) use ($request) {
+                $q->whereHas('classroom', function ($q2) use ($request) {
+                    $q2->where('subject', 'like', '%'.$request->search.'%');
+                })->orWhere('title', 'like', '%'.$request->search.'%');
+            });
         }
 
         if ($request->filled('type')) {
@@ -31,17 +42,21 @@ class MateriController extends Controller
         ]);
     }
 
-    public function show(Material $material)
+    public function show(Material $material): Response
     {
+        if ($material->class_id && ! Auth::user()->enrolledClasses()->where('class_rooms.id', $material->class_id)->exists()) {
+            abort(403);
+        }
+
         $material->load(['teacher', 'classroom']);
 
-        $nextMateri = Material::where('class_id', $material->class_id)
+        $nextMateri = Material::query()->where('class_id', $material->class_id)
             ->where('status', 'published')
             ->where('order', '>', $material->order)
             ->orderBy('order', 'asc')
             ->first();
 
-        $isCompleted = MateriProgres::where('student_id', Auth::id())
+        $isCompleted = MateriProgres::query()->where('student_id', Auth::id())
             ->where('material_id', $material->id)
             ->exists();
 
@@ -52,9 +67,9 @@ class MateriController extends Controller
         ]);
     }
 
-    public function completed(Material $material)
+    public function completed(Material $material): RedirectResponse
     {
-        MateriProgres::firstOrCreate([
+        MateriProgres::query()->firstOrCreate([
             'student_id' => Auth::id(),
             'material_id' => $material->id,
         ], [

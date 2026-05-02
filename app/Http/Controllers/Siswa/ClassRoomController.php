@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers\Siswa;
 
-use App\Http\Controllers\Controller;
 use App\Models\ClassRoom;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
+use Inertia\Response;
 
-class ClassRoomController extends Controller
+class ClassRoomController
 {
-    public function index()
+    public function index(): Response
     {
         $classrooms = Auth::user()
             ->enrolledClasses()
@@ -18,12 +20,12 @@ class ClassRoomController extends Controller
             ->latest()
             ->get();
 
-        return Inertia('Siswa/ClassRoom/Index', [
+        return Inertia::render('Siswa/ClassRoom/Index', [
             'classrooms' => $classrooms,
         ]);
     }
 
-    public function join(Request $request)
+    public function join(Request $request): RedirectResponse
     {
         // Validasi input kode
         $request->validate([
@@ -33,7 +35,7 @@ class ClassRoomController extends Controller
         ]);
 
         // cari berdasarkan code
-        $classroom = ClassRoom::where('code', strtoupper($request->code))->first();
+        $classroom = ClassRoom::query()->where('code', strtoupper($request->code))->first();
 
         // cek jika kelas tidak ditemukkan
         if (! $classroom) {
@@ -54,7 +56,7 @@ class ClassRoomController extends Controller
             ->with('success', "Berhasil bergabung ke kelas {$classroom->name}");
     }
 
-    public function leave(ClassRoom $classroom)
+    public function leave(ClassRoom $classroom): RedirectResponse
     {
         $user = Auth::user();
 
@@ -70,7 +72,7 @@ class ClassRoomController extends Controller
             ->with('success', "Berhasil keluar dari kelas {$classroom->name}");
     }
 
-    public function show(ClassRoom $classroom)
+    public function show(ClassRoom $classroom): Response
     {
         $user = Auth::user();
 
@@ -96,10 +98,10 @@ class ClassRoomController extends Controller
         })->count();
 
         $progressValue = $totalMaterials > 0
-            ? round(($completedMaterials / $totalMaterials) * 100)
+            ? (int) round(($completedMaterials / $totalMaterials) * 100)
             : 0;
 
-        return inertia('Siswa/ClassRoom/Show', [
+        return Inertia::render('Siswa/ClassRoom/Show', [
             'classroom' => $classroom,
             'materials' => $classroom->materials,
             'progressValue' => $progressValue,

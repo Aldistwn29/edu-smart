@@ -72,6 +72,12 @@ export default function QuizBuilder({ classrooms }) {
         setData('questions', updated);
     };
 
+    const updateQuestion = (index, updates) => {
+        const updated = [...data.questions];
+        updated[index] = { ...updated[index], ...updates };
+        setData('questions', updated);
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
         toast.loading('Menyimpan quiz...');

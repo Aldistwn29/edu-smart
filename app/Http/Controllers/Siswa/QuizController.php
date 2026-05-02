@@ -2,22 +2,23 @@
 
 namespace App\Http\Controllers\Siswa;
 
-use App\Http\Controllers\Controller;
 use App\Models\QuizAnswer;
 use App\Models\QuizAttempt;
 use App\Models\Quize;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Inertia\Response;
 
-class QuizController extends Controller
+class QuizController
 {
-    public function index()
+    public function index(): Response
     {
         $user = Auth::user();
         $classIds = $user->enrolledClasses()->pluck('class_rooms.id');
 
-        $quizzes = Quize::whereIn('class_id', $classIds)
+        $quizzes = Quize::query()->whereIn('class_id', $classIds)
             ->with(['attempts' => function ($q) use ($user) {
                 $q->where('student_id', $user->id);
             }, 'classroom', 'teacher'])
@@ -40,16 +41,24 @@ class QuizController extends Controller
             });
 
         // Untuk stats, kita butuh data mentah tanpa paginasi
-        $allQuizzes = Quize::whereIn('class_id', $classIds)
+        $allQuizzes = Quize::query()->whereIn('class_id', $classIds)
             ->with(['attempts' => function ($q) use ($user) {
                 $q->where('student_id', $user->id);
             }])
             ->get();
 
         $stats = [
-            'total_selesai' => $allQuizzes->where('status', 'selesai')->count(),
-            'rata_rata' => round($allQuizzes->where('status', 'selesai')->avg('score')) ?: 0,
-            'mendatang' => $allQuizzes->where('status', 'tersedia')->where('is_overdue', false)->count(),
+            'total_selesai' => QuizAttempt::query()
+                ->where('student_id', $user->id)
+                ->whereNotNull('end_date')
+                ->count(),
+            'rata_rata' => (int) round(QuizAttempt::query()
+                ->where('student_id', $user->id)
+                ->whereNotNull('end_date')
+                ->avg('score') ?? 0),
+            'mendatang' => $allQuizzes->where('status', 'tersedia')
+                ->where('is_overdue', false)
+                ->count(),
         ];
 
         return Inertia::render('Siswa/Quiz/Index', [
@@ -58,11 +67,11 @@ class QuizController extends Controller
         ]);
     }
 
-    public function show(Quize $quiz)
+    public function show(Quize $quiz): Response|RedirectResponse
     {
         $user = Auth::user();
 
-        $existAttempt = QuizAttempt::where('quiz_id', $quiz->id)
+        $existAttempt = QuizAttempt::query()->where('quiz_id', $quiz->id)
             ->where('student_id', $user->id)
             ->first();
 
@@ -75,7 +84,7 @@ class QuizController extends Controller
             return redirect()->back()->with('error', 'Waktu Pengerjaan kuis sudah terlambat');
         }
 
-        $attempt = QuizAttempt::firstOrCreate(
+        $attempt = QuizAttempt::query()->firstOrCreate(
             ['quiz_id' => $quiz->id, 'student_id' => $user->id],
             ['start_date' => now()],
         );
@@ -92,10 +101,10 @@ class QuizController extends Controller
         ]);
     }
 
-    public function submit(Request $request, Quize $quiz)
+    public function submit(Request $request, Quize $quiz): RedirectResponse
     {
         $user = Auth::user();
-        $attempt = QuizAttempt::where('quiz_id', $quiz->id)
+        $attempt = QuizAttempt::query()->where('quiz_id', $quiz->id)
             ->where('student_id', $user->id)
             ->firstOrFail();
 
@@ -115,7 +124,7 @@ class QuizController extends Controller
                 $correctAnswers++;
             }
 
-            QuizAnswer::updateOrCreate(
+            QuizAnswer::query()->updateOrCreate(
                 ['attempt_id' => $attempt->id, 'question_id' => $question->id],
                 [
                     'student_answer' => $dbAnswer,
@@ -125,7 +134,7 @@ class QuizController extends Controller
             );
         }
 
-        $score = ($correctAnswers / $totalQuestions) * 100;
+        $score = $totalQuestions > 0 ? ($correctAnswers / $totalQuestions) * 100 : 0;
 
         $attempt->update([
             'end_date' => now(),
@@ -136,10 +145,10 @@ class QuizController extends Controller
         return redirect()->route('siswa.quizzes.index')->with('success', 'Kuis berhasil dikirim!');
     }
 
-    public function result(Quize $quiz)
+    public function result(Quize $quiz): Response
     {
         $user = Auth::user();
-        $attempt = QuizAttempt::where('quiz_id', $quiz->id)
+        $attempt = QuizAttempt::query()->where('quiz_id', $quiz->id)
             ->where('student_id', $user->id)
             ->with(['answers'])
             ->firstOrFail();

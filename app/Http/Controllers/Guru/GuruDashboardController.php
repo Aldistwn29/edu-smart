@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Guru;
 
-use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\ClassRoom;
 use App\Models\Material;
@@ -11,20 +10,21 @@ use App\Models\Quize;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Inertia\Response;
 
-class GuruDashboardController extends Controller
+class GuruDashboardController
 {
-    public function dashboard()
+    public function dashboard(): Response
     {
-        $teacher_id = Auth::id();
+        $teacherId = Auth::id();
 
         // Data statistika utama
-        $totalStudents = ClassRoom::where('teacher_id', $teacher_id)
+        $totalStudents = ClassRoom::query()->where('teacher_id', $teacherId)
             ->withCount('students')->get()->sum('students_count');
 
-        $newStudentsThisMonth = User::where('role', 'siswa')
-            ->whereHas('enrolledClasses', function ($q) use ($teacher_id) {
-                $q->where('teacher_id', $teacher_id)
+        $newStudentsThisMonth = User::query()->where('role', 'siswa')
+            ->whereHas('enrolledClasses', function ($q) use ($teacherId) {
+                $q->where('teacher_id', $teacherId)
                     ->where('classroom_user.created_at', '>=', now()->startOfMonth());
             })
             ->count();
@@ -35,23 +35,23 @@ class GuruDashboardController extends Controller
                 'change' => "+ $newStudentsThisMonth Bulan ini",
             ],
             'total_subject' => [
-                'value' => Material::where('teacher_id', $teacher_id)->count(),
+                'value' => Material::query()->where('teacher_id', $teacherId)->count(),
                 'change' => 'Total Materi',
             ],
             'total_quizzes' => [
-                'value' => Quize::where('teacher_id', $teacher_id)->count(),
+                'value' => Quize::query()->where('teacher_id', $teacherId)->count(),
                 'change' => 'Kuis aktif',
             ],
             'avg_score' => [
-                'value' => round(QuizAttempt::whereHas('quiz', function ($q) use ($teacher_id) {
-                    $q->where('teacher_id', $teacher_id);
+                'value' => round(QuizAttempt::query()->whereHas('quiz', function ($q) use ($teacherId) {
+                    $q->where('teacher_id', $teacherId);
                 })->avg('score') ?? 0, 1),
                 'change' => 'Rata-rata kuis',
             ],
         ];
 
-        // Ambil aktifitas terbaru (dari semua guru jika ingin global, atau spesifik guru)
-        $activities = ActivityLog::where('user_id', $teacher_id)
+        // Ambil aktifitas terbaru
+        $activities = ActivityLog::query()->where('user_id', $teacherId)
             ->latest()
             ->take(5)
             ->get()
