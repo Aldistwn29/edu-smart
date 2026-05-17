@@ -87,6 +87,16 @@ class QuizController
     {
         Gate::authorize('create', Quize::class);
 
+        $messages = [
+            'class_id.required' => 'Tolong pilih kelas terlebih dahulu.',
+            'title.required' => 'Tolong masukkan judul kuis.',
+            'duration_minutes.required' => 'Tolong masukkan durasi kuis.',
+            'deadline_date.required' => 'Tolong masukkan tanggal batas waktu.',
+            'deadline_time.required' => 'Tolong masukkan jam batas waktu.',
+            'questions.*.text.required' => 'Tolong masukkan soalnya.',
+            'questions.*.options.*.option_text.required' => 'Tolong masukkan opsi jawabannya.',
+        ];
+
         $request->validate([
             'class_id' => 'required|exists:class_rooms,id',
             'title' => 'required|string|max:255',
@@ -101,7 +111,7 @@ class QuizController
             'questions.*.options' => 'required|array|min:2',
             'questions.*.options.*.option_text' => 'required|string',
             'questions.*.options.*.is_correct' => 'required',
-        ]);
+        ], $messages);
 
         try {
             DB::beginTransaction();
@@ -178,6 +188,16 @@ class QuizController
     {
         Gate::authorize('update', $quiz);
 
+        $messages = [
+            'class_id.required' => 'Tolong pilih kelas terlebih dahulu.',
+            'title.required' => 'Tolong masukkan judul kuis.',
+            'duration_minutes.required' => 'Tolong masukkan durasi kuis.',
+            'deadline_date.required' => 'Tolong masukkan tanggal batas waktu.',
+            'deadline_time.required' => 'Tolong masukkan jam batas waktu.',
+            'questions.*.text.required' => 'Tolong masukkan soalnya.',
+            'questions.*.options.*.option_text.required' => 'Tolong masukkan opsi jawabannya.',
+        ];
+
         $request->validate([
             'class_id' => 'required|exists:class_rooms,id',
             'title' => 'required|string|max:255',
@@ -193,7 +213,7 @@ class QuizController
             'questions.*.options' => 'required|array|min:2',
             'questions.*.options.*.option_text' => 'required|string',
             'questions.*.options.*.is_correct' => 'required',
-        ]);
+        ], $messages);
 
         try {
             DB::beginTransaction();
@@ -270,7 +290,7 @@ class QuizController
         return Inertia::render('Guru/Quiz/Show', [
             'quiz' => $quiz,
             'attempts' => $attempts,
-            'unsubmitted_students' => $unsubmitted_students->values(),
+            'unsubmitted_students' => $unsubmittedStudents->values(),
         ]);
     }
 

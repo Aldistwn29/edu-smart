@@ -85,9 +85,10 @@ export default function QuizBuilder({ classrooms }) {
             onSuccess: () => {
                 toast.success('Quiz berhasil disimpan');
             },
-            onError: () => {
+            onError: (err) => {
+                const firstError = Object.values(err)[0];
                 toast.error('Quiz gagal disimpan', {
-                    description: 'Terjadi kesalahan saat menyimpan quiz',
+                    description: firstError || 'Terjadi kesalahan saat menyimpan quiz. Pastikan semua field terisi.',
                 });
             },
             onFinish: () => {
@@ -213,22 +214,32 @@ export default function QuizBuilder({ classrooms }) {
                             Batas Waktu
                         </Label>
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            <Input
-                                type="date"
-                                value={data.deadline_date}
-                                onChange={(e) =>
-                                    setData('deadline_date', e.target.value)
-                                }
-                                className="rounded-2xl border-slate-200 font-black"
-                            />
-                            <Input
-                                type="time"
-                                value={data.deadline_time}
-                                onChange={(e) =>
-                                    setData('deadline_time', e.target.value)
-                                }
-                                className="rounded-2xl border-slate-200 font-black"
-                            />
+                            <div>
+                                <Input
+                                    type="date"
+                                    value={data.deadline_date}
+                                    onChange={(e) =>
+                                        setData('deadline_date', e.target.value)
+                                    }
+                                    className="rounded-2xl border-slate-200 font-black"
+                                />
+                                {errors.deadline_date && (
+                                    <p className="mt-1 text-sm text-red-500">{errors.deadline_date}</p>
+                                )}
+                            </div>
+                            <div>
+                                <Input
+                                    type="time"
+                                    value={data.deadline_time}
+                                    onChange={(e) =>
+                                        setData('deadline_time', e.target.value)
+                                    }
+                                    className="rounded-2xl border-slate-200 font-black"
+                                />
+                                {errors.deadline_time && (
+                                    <p className="mt-1 text-sm text-red-500">{errors.deadline_time}</p>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -312,19 +323,26 @@ export default function QuizBuilder({ classrooms }) {
                                 </div>
                             </div>
 
-                            <textarea
-                                className="w-full rounded-2xl border-none bg-slate-50 p-4 text-lg font-medium transition-all focus:border-primary focus:ring-2 focus:ring-primary"
-                                placeholder="Tuliskan pertanyaan..."
-                                value={q.text}
-                                onChange={(e) => {
-                                    const updated = [...data.questions];
-                                    updated[index] = {
-                                        ...updated[index],
-                                        text: e.target.value,
-                                    };
-                                    setData('questions', updated);
-                                }}
-                            />
+                            <div className="w-full">
+                                <textarea
+                                    className="w-full rounded-2xl border-none bg-slate-50 p-4 text-lg font-medium transition-all focus:border-primary focus:ring-2 focus:ring-primary"
+                                    placeholder="Tuliskan pertanyaan..."
+                                    value={q.text}
+                                    onChange={(e) => {
+                                        const updated = [...data.questions];
+                                        updated[index] = {
+                                            ...updated[index],
+                                            text: e.target.value,
+                                        };
+                                        setData('questions', updated);
+                                    }}
+                                />
+                                {errors[`questions.${index}.text`] && (
+                                    <p className="mt-1 text-sm font-bold text-red-500 text-left">
+                                        *{errors[`questions.${index}.text`]}
+                                    </p>
+                                )}
+                            </div>
 
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 {q.options.map((opt, optIndex) => (
@@ -357,35 +375,42 @@ export default function QuizBuilder({ classrooms }) {
                                         >
                                             <CheckCircle2 className="h-5 w-5" />
                                         </div>
-                                        <Input
-                                            type="text"
-                                            className="w-full border-none bg-transparent font-bold focus:ring-0"
-                                            placeholder={`Opsi ${optIndex + 1}`}
-                                            value={opt.option_text}
-                                            disabled={q.type === 'true_false'}
-                                            onClick={(e) => e.stopPropagation()}
-                                            onChange={(e) => {
-                                                const updatedQuestions = [
-                                                    ...data.questions,
-                                                ];
-                                                const updatedOptions = [
-                                                    ...updatedQuestions[index]
-                                                        .options,
-                                                ];
-                                                updatedOptions[optIndex] = {
-                                                    ...updatedOptions[optIndex],
-                                                    option_text: e.target.value,
-                                                };
-                                                updatedQuestions[index] = {
-                                                    ...updatedQuestions[index],
-                                                    options: updatedOptions,
-                                                };
-                                                setData(
-                                                    'questions',
-                                                    updatedQuestions,
-                                                );
-                                            }}
-                                        />
+                                        <div className="w-full">
+                                            <Input
+                                                type="text"
+                                                className="w-full border-none bg-transparent font-bold focus:ring-0"
+                                                placeholder={`Opsi ${optIndex + 1}`}
+                                                value={opt.option_text}
+                                                disabled={q.type === 'true_false'}
+                                                onClick={(e) => e.stopPropagation()}
+                                                onChange={(e) => {
+                                                    const updatedQuestions = [
+                                                        ...data.questions,
+                                                    ];
+                                                    const updatedOptions = [
+                                                        ...updatedQuestions[index]
+                                                            .options,
+                                                    ];
+                                                    updatedOptions[optIndex] = {
+                                                        ...updatedOptions[optIndex],
+                                                        option_text: e.target.value,
+                                                    };
+                                                    updatedQuestions[index] = {
+                                                        ...updatedQuestions[index],
+                                                        options: updatedOptions,
+                                                    };
+                                                    setData(
+                                                        'questions',
+                                                        updatedQuestions,
+                                                    );
+                                                }}
+                                            />
+                                            {errors[`questions.${index}.options.${optIndex}.option_text`] && (
+                                                <p className="mt-1 text-xs font-bold text-red-500">
+                                                    *{errors[`questions.${index}.options.${optIndex}.option_text`]}
+                                                </p>
+                                            )}
+                                        </div>
                                     </div>
                                 ))}
                             </div>

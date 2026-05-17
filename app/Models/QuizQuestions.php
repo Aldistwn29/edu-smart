@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class QuizQuestions extends Model
 {
+    public $timestamps = false;
+
     protected $fillable = [
         'quize_id',
         'question',
