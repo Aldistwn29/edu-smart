@@ -18,7 +18,7 @@ class QuizController
         $user = Auth::user();
         $classIds = $user->enrolledClasses()->pluck('class_rooms.id');
 
-        $quizzes = Quize::query()->whereIn('class_id', $classIds)
+        $quizzes = Quize::query()->whereIn('class_id', $classIds, 'and', false)
             ->with(['attempts' => function ($q) use ($user) {
                 $q->where('student_id', $user->id);
             }, 'classroom', 'teacher'])
@@ -41,7 +41,7 @@ class QuizController
             });
 
         // Untuk stats, kita butuh data mentah tanpa paginasi
-        $allQuizzes = Quize::query()->whereIn('class_id', $classIds)
+        $allQuizzes = Quize::query()->whereIn('class_id', $classIds, 'and', false)
             ->with(['attempts' => function ($q) use ($user) {
                 $q->where('student_id', $user->id);
             }])
