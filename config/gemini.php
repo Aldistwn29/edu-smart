@@ -24,7 +24,17 @@ return [
     | If you need a specific base URL for the Gemini API, you can provide it here.
     | Otherwise, leave empty to use the default value.
     */
-    'base_url' => env('GEMINI_BASE_URL'),
+    'base_url' => env('GEMINI_BASE_URL') ?: 'https://generativelanguage.googleapis.com/v1beta/models/',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Gemini Model
+    |--------------------------------------------------------------------------
+    |
+    | The model that you want to use for generating content. By default,
+    | the client will use 'gemini-2.5-flash'.
+    */
+    'model' => env('GEMINI_MODEL') ?: 'gemini-2.5-flash',
 
     /*
     |--------------------------------------------------------------------------

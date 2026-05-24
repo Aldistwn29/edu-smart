@@ -53,11 +53,17 @@ class LearningAnalysisService
 
         $finalPrompt = $this->buildFinalPrompt($user, $message);
 
-        try {
-            Log::info('Calling Gemini API v1beta with model: gemini-2.5-flash');
+        $baseUrl = config('gemini.base_url');
+        $model = config('gemini.model');
+        $timeout = (int) config('gemini.request_timeout', 30);
 
-            $response = Http::timeout(30)
-                ->post("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={$apiKey}", [
+        try {
+            Log::info("Calling Gemini API with model: {$model}");
+
+            $url = rtrim($baseUrl, '/').'/'.$model.':generateContent?key='.$apiKey;
+
+            $response = Http::timeout($timeout)
+                ->post($url, [
                     'contents' => [
                         [
                             'parts' => [
