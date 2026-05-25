@@ -6,44 +6,53 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Gemini API Key
+    | Google Gemini API Key
     |--------------------------------------------------------------------------
     |
-    | Here you may specify your Gemini API Key and organization. This will be
-    | used to authenticate with the Gemini API - you can find your API key
-    | on Google AI Studio, at https://aistudio.google.com/app/apikey.
+    | API key dari Google AI Studio (https://aistudio.google.com/app/apikey).
     */
-
     'api_key' => env('GEMINI_API_KEY'),
 
     /*
     |--------------------------------------------------------------------------
-    | Gemini Base URL
+    | Gemini Proxy URL (Cloudflare Workers)
     |--------------------------------------------------------------------------
     |
-    | If you need a specific base URL for the Gemini API, you can provide it here.
-    | Otherwise, leave empty to use the default value.
+    | Base URL Cloudflare Worker sebagai reverse proxy ke Google API.
+    | Wajib diisi untuk VPS region Indonesia.
+    |
+    | Jika kosong, request langsung ke:
+    | https://generativelanguage.googleapis.com
     */
-    'base_url' => env('GEMINI_BASE_URL') ?: 'https://generativelanguage.googleapis.com/v1beta/models/',
+    'proxy_url' => env('GEMINI_PROXY_URL'),
 
     /*
     |--------------------------------------------------------------------------
     | Gemini Model
     |--------------------------------------------------------------------------
     |
-    | The model that you want to use for generating content. By default,
-    | the client will use 'gemini-2.5-flash'.
+    | Model yang digunakan. Untuk Google langsung, tanpa prefix "google/".
+    | Contoh: gemini-2.5-flash, gemini-2.0-flash
     */
-    'model' => env('GEMINI_MODEL') ?: 'gemini-2.5-flash',
+    'model' => env('GEMINI_MODEL', 'gemini-2.5-flash'),
 
     /*
     |--------------------------------------------------------------------------
     | Request Timeout
     |--------------------------------------------------------------------------
     |
-    | The timeout may be used to specify the maximum number of seconds to wait
-    | for a response. By default, the client will time out after 30 seconds.
+    | Maksimum detik menunggu response dari API.
     */
-
     'request_timeout' => env('GEMINI_REQUEST_TIMEOUT', 30),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Request Proxy (opsional)
+    |--------------------------------------------------------------------------
+    |
+    | HTTP/SOCKS proxy jika diperlukan.
+    | Format: http://proxy-server:port atau socks5://proxy-server:port
+    */
+    'proxy' => env('GEMINI_PROXY'),
+
 ];

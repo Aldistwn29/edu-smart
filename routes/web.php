@@ -71,7 +71,7 @@ Route::middleware(['auth', 'role:guru'])->prefix('guru')->name('guru.')->group(f
     Route::get('/materies/create', [MateriController::class, 'create'])->name('materies.create');
     Route::post('/materies', [MateriController::class, 'store'])->name('materies.store');
     Route::get('/materies/{materi}/edit', [MateriController::class, 'edit'])->name('materies.edit');
-    Route::get('/materies/{materi}', [MateriController::class, 'show'])->name('materi.show');
+    Route::get('/materies/{materi}', [MateriController::class, 'show'])->name('materies.show');
     Route::put('/materies/{materi}', [MateriController::class, 'update'])->name('materies.update');
     Route::delete('/materies/{materi}/delete', [MateriController::class, 'destroy'])->name('materies.destroy');
 
