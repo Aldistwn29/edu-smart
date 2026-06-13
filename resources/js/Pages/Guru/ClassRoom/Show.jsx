@@ -79,10 +79,10 @@ export default function Show({ classroom, materials, quizzes = [] }) {
                 <div className="flex items-center">
                     <Link
                         href={route('guru.classroom.index')}
-                        className="group flex items-center gap-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-primary"
+                        className="flex items-center gap-2 text-sm font-semibold transition-colors group text-muted-foreground hover:text-primary"
                     >
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-card shadow-sm ring-1 ring-border/50 transition-all group-hover:bg-primary group-hover:text-primary-foreground group-hover:ring-primary">
-                            <ChevronLeft className="h-6 w-6" />
+                        <div className="flex items-center justify-center w-10 h-10 transition-all shadow-sm rounded-xl bg-card ring-1 ring-border/50 group-hover:bg-primary group-hover:text-primary-foreground group-hover:ring-primary">
+                            <ChevronLeft className="w-6 h-6" />
                         </div>
                         Kembali ke Daftar Kelas
                     </Link>
@@ -90,8 +90,8 @@ export default function Show({ classroom, materials, quizzes = [] }) {
 
                 {/* Header Section */}
                 <div className="relative overflow-hidden rounded-[2.5rem] border border-border/50 p-8 shadow-xl shadow-primary/5 md:p-12">
-                    <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-primary/5 blur-3xl" />
-                    <div className="absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
+                    <div className="absolute w-64 h-64 rounded-full -right-20 -top-20 bg-primary/5 blur-3xl" />
+                    <div className="absolute w-64 h-64 rounded-full -bottom-20 -left-20 bg-primary/10 blur-3xl" />
 
                     <div className="relative z-10">
                         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
@@ -99,11 +99,11 @@ export default function Show({ classroom, materials, quizzes = [] }) {
                                 <div className="flex items-center gap-3">
                                     <Badge
                                         variant="outline"
-                                        className="rounded-lg border-primary/20 bg-primary/5 text-xs font-bold uppercase tracking-widest text-primary"
+                                        className="text-xs font-bold tracking-widest uppercase rounded-lg border-primary/20 bg-primary/5 text-primary"
                                     >
                                         {classroom.subject}
                                     </Badge>
-                                    <span className="h-1 w-1 rounded-full bg-border" />
+                                    <span className="w-1 h-1 rounded-full bg-border" />
                                     <span className="text-sm font-medium text-muted-foreground">
                                         {classroom.academic_year}
                                     </span>
@@ -113,7 +113,7 @@ export default function Show({ classroom, materials, quizzes = [] }) {
                                 </h1>
                                 <p className="flex items-center gap-2 text-lg font-medium text-muted-foreground">
                                     Kode Kelas:
-                                    <span className="cursor-pointer select-all rounded-lg bg-muted px-3 py-1 font-mono text-xl text-primary transition-colors hover:bg-primary/5">
+                                    <span className="px-3 py-1 font-mono text-xl transition-colors rounded-lg cursor-pointer select-all bg-muted text-primary hover:bg-primary/5">
                                         {classroom.code}
                                     </span>
                                 </p>
@@ -127,22 +127,22 @@ export default function Show({ classroom, materials, quizzes = [] }) {
                     {/* Left: Students Sidebar */}
                     <div className="lg:col-span-4 lg:row-span-2">
                         <Card className="flex h-full flex-col overflow-hidden rounded-[2rem] border-none bg-card/50 shadow-xl backdrop-blur-sm">
-                            <CardHeader className="space-y-4 border-b bg-muted/30 pb-6 pt-8">
+                            <CardHeader className="pt-8 pb-6 space-y-4 border-b bg-muted/30">
                                 <div className="flex items-center justify-between">
                                     <CardTitle className="flex items-center gap-3 text-2xl font-black">
-                                        <Users className="h-6 w-6 text-primary" />
+                                        <Users className="w-6 h-6 text-primary" />
                                         Siswa
                                     </CardTitle>
-                                    <Badge className="rounded-xl px-3 py-1 text-sm">
+                                    <Badge className="px-3 py-1 text-sm rounded-xl">
                                         {classroom.students?.length || 0} Total
                                     </Badge>
                                 </div>
                                 <div className="relative">
-                                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                                    <Search className="absolute w-4 h-4 -translate-y-1/2 left-3 top-1/2 text-muted-foreground" />
                                     <input
                                         type="text"
                                         placeholder="Cari siswa..."
-                                        className="h-10 w-full rounded-xl border-none bg-background/50 pl-10 pr-4 text-sm ring-1 ring-border focus:ring-2 focus:ring-primary"
+                                        className="w-full h-10 pl-10 pr-4 text-sm border-none rounded-xl bg-background/50 ring-1 ring-border focus:ring-2 focus:ring-primary"
                                         value={searchTerm}
                                         onChange={(e) =>
                                             setSearchTerm(e.target.value)
@@ -151,7 +151,7 @@ export default function Show({ classroom, materials, quizzes = [] }) {
                                 </div>
                             </CardHeader>
                             <ScrollArea className="flex-1 px-2 py-4">
-                                <div className="space-y-1 px-4">
+                                <div className="px-4 space-y-1">
                                     <AnimatePresence mode="popLayout">
                                         {filteredStudents.length > 0 ? (
                                             filteredStudents.map((student) => (
@@ -165,36 +165,36 @@ export default function Show({ classroom, materials, quizzes = [] }) {
                                                         opacity: 0,
                                                         scale: 0.9,
                                                     }}
-                                                    className="group flex cursor-pointer items-center gap-4 rounded-2xl p-3 transition-all hover:bg-primary/5 hover:pl-4"
+                                                    className="flex items-center gap-4 p-3 transition-all cursor-pointer group rounded-2xl hover:bg-primary/5 hover:pl-4"
                                                 >
-                                                    <Avatar className="h-12 w-12 border-2 border-transparent transition-all group-hover:border-primary/20">
-                                                        <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/5 font-bold text-primary">
+                                                    <Avatar className="w-12 h-12 transition-all border-2 border-transparent group-hover:border-primary/20">
+                                                        <AvatarFallback className="font-bold bg-gradient-to-br from-primary/20 to-primary/5 text-primary">
                                                             {student.name.charAt(
                                                                 0,
                                                             )}
                                                         </AvatarFallback>
                                                     </Avatar>
                                                     <div className="flex-1 overflow-hidden">
-                                                        <p className="truncate text-sm font-bold tracking-tight">
+                                                        <p className="text-sm font-bold tracking-tight truncate">
                                                             {student.name}
                                                         </p>
-                                                        <p className="truncate text-xs text-muted-foreground">
+                                                        <p className="text-xs truncate text-muted-foreground">
                                                             {student.email}
                                                         </p>
                                                     </div>
                                                     <Button
                                                         variant="ghost"
                                                         size="icon"
-                                                        className="opacity-0 transition-opacity group-hover:opacity-100"
+                                                        className="transition-opacity opacity-0 group-hover:opacity-100"
                                                     >
-                                                        <MoreVertical className="h-4 w-4 text-muted-foreground" />
+                                                        <MoreVertical className="w-4 h-4 text-muted-foreground" />
                                                     </Button>
                                                 </motion.div>
                                             ))
                                         ) : (
                                             <div className="py-20 text-center">
-                                                <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-muted">
-                                                    <Users className="h-8 w-8 text-muted-foreground/50" />
+                                                <div className="inline-flex items-center justify-center w-16 h-16 mb-4 rounded-full bg-muted">
+                                                    <Users className="w-8 h-8 text-muted-foreground/50" />
                                                 </div>
                                                 <p className="text-sm font-medium text-muted-foreground">
                                                     Tidak ada siswa ditemukan
@@ -211,19 +211,19 @@ export default function Show({ classroom, materials, quizzes = [] }) {
                     <div className="lg:col-span-8">
                         <Tabs defaultValue="materials" className="space-y-8">
                             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                                <TabsList className="h-14 w-fit items-center rounded-2xl bg-card/50 p-1 shadow-sm backdrop-blur-md">
+                                <TabsList className="items-center p-1 shadow-sm h-14 w-fit rounded-2xl bg-card/50 backdrop-blur-md">
                                     <TabsTrigger
                                         value="materials"
                                         className="h-full gap-2 rounded-xl px-8 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg"
                                     >
-                                        <BookOpen className="h-4 w-4" />
+                                        <BookOpen className="w-4 h-4" />
                                         Materi
                                     </TabsTrigger>
                                     <TabsTrigger
                                         value="quizzes"
                                         className="h-full gap-2 rounded-xl px-8 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg"
                                     >
-                                        <ClipboardList className="h-4 w-4" />
+                                        <ClipboardList className="w-4 h-4" />
                                         Quiz
                                     </TabsTrigger>
                                 </TabsList>
@@ -242,14 +242,14 @@ export default function Show({ classroom, materials, quizzes = [] }) {
                                                     animate="visible"
                                                     layout
                                                 >
-                                                    <Card className="group relative overflow-hidden rounded-3xl border-none bg-card/50 p-6 transition-all hover:bg-card hover:shadow-2xl hover:shadow-primary/5">
+                                                    <Card className="relative p-6 overflow-hidden transition-all border-none group rounded-3xl bg-card/50 hover:bg-card hover:shadow-2xl hover:shadow-primary/5">
                                                         <div className="flex items-start gap-5">
-                                                            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-white">
+                                                            <div className="flex items-center justify-center transition-colors h-14 w-14 shrink-0 rounded-2xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white">
                                                                 <FileText className="h-7 w-7" />
                                                             </div>
                                                             <div className="flex-1 space-y-1">
                                                                 <div className="flex items-start justify-between">
-                                                                    <h3 className="line-clamp-1 text-lg font-black transition-colors group-hover:text-primary">
+                                                                    <h3 className="text-lg font-black transition-colors line-clamp-1 group-hover:text-primary">
                                                                         {
                                                                             m.title
                                                                         }
@@ -263,7 +263,7 @@ export default function Show({ classroom, materials, quizzes = [] }) {
                                                                                 size="icon"
                                                                                 className="rounded-full"
                                                                             >
-                                                                                <MoreVertical className="h-4 w-4 text-muted-foreground" />
+                                                                                <MoreVertical className="w-4 h-4 text-muted-foreground" />
                                                                             </Button>
                                                                         </DropdownMenuTrigger>
                                                                         <DropdownMenuContent
@@ -271,24 +271,24 @@ export default function Show({ classroom, materials, quizzes = [] }) {
                                                                             className="rounded-2xl"
                                                                         >
                                                                             <DropdownMenuItem className="gap-2">
-                                                                                <Download className="h-4 w-4" />
+                                                                                <Download className="w-4 h-4" />
                                                                                 Download
                                                                             </DropdownMenuItem>
                                                                             <DropdownMenuItem className="gap-2 text-destructive">
-                                                                                <Trash2 className="h-4 w-4" />
+                                                                                <Trash2 className="w-4 h-4" />
                                                                                 Hapus
                                                                             </DropdownMenuItem>
                                                                         </DropdownMenuContent>
                                                                     </DropdownMenu>
                                                                 </div>
-                                                                <p className="line-clamp-2 text-sm text-muted-foreground">
+                                                                <p className="text-sm line-clamp-2 text-muted-foreground">
                                                                     {m.description ||
                                                                         'Tidak ada deskripsi untuk materi ini.'}
                                                                 </p>
-                                                                <div className="mt-4 flex items-center gap-4 pt-2">
+                                                                <div className="flex items-center gap-4 pt-2 mt-4">
                                                                     <Badge
                                                                         variant="outline"
-                                                                        className="rounded-lg text-xs"
+                                                                        className="text-xs rounded-lg"
                                                                     >
                                                                         {m.type ||
                                                                             'FILE'}
@@ -311,13 +311,13 @@ export default function Show({ classroom, materials, quizzes = [] }) {
                                                 animate={{ opacity: 1 }}
                                                 className="flex flex-col items-center justify-center rounded-[3rem] border-2 border-dashed border-border/50 bg-muted/20 py-24"
                                             >
-                                                <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-background shadow-inner">
-                                                    <BookOpen className="h-12 w-12 text-muted-foreground/30" />
+                                                <div className="flex items-center justify-center w-24 h-24 mb-6 rounded-full shadow-inner bg-background">
+                                                    <BookOpen className="w-12 h-12 text-muted-foreground/30" />
                                                 </div>
                                                 <h3 className="text-2xl font-black">
                                                     Belum ada materi
                                                 </h3>
-                                                <p className="mt-2 max-w-sm text-center font-medium text-muted-foreground">
+                                                <p className="max-w-sm mt-2 font-medium text-center text-muted-foreground">
                                                     Bagikan modul atau bahan
                                                     ajar untuk mulai belajar
                                                     bersama siswa di kelas ini.
@@ -341,20 +341,20 @@ export default function Show({ classroom, materials, quizzes = [] }) {
                                                     animate="visible"
                                                     layout
                                                 >
-                                                    <Card className="group relative overflow-hidden rounded-3xl border-none bg-card/50 p-6 transition-all hover:bg-card hover:shadow-2xl hover:shadow-primary/5">
+                                                    <Card className="relative p-6 overflow-hidden transition-all border-none group rounded-3xl bg-card/50 hover:bg-card hover:shadow-2xl hover:shadow-primary/5">
                                                         <div className="flex items-start gap-5">
-                                                            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-white">
+                                                            <div className="flex items-center justify-center transition-colors h-14 w-14 shrink-0 rounded-2xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white">
                                                                 <ClipboardList className="h-7 w-7" />
                                                             </div>
                                                             <div className="flex-1 space-y-2">
                                                                 <div className="flex items-start justify-between">
                                                                     <div>
-                                                                        <h3 className="line-clamp-1 text-lg font-black transition-colors group-hover:text-primary">
+                                                                        <h3 className="text-lg font-black transition-colors line-clamp-1 group-hover:text-primary">
                                                                             {
                                                                                 q.title
                                                                             }
                                                                         </h3>
-                                                                        <div className="mt-1 flex items-center gap-3">
+                                                                        <div className="flex items-center gap-3 mt-1">
                                                                             <Badge
                                                                                 variant="secondary"
                                                                                 className="border-none bg-primary/5 text-[10px] font-bold text-primary"
@@ -364,7 +364,7 @@ export default function Show({ classroom, materials, quizzes = [] }) {
                                                                                 Soal
                                                                             </Badge>
                                                                             <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                                                                                <Clock className="h-3 w-3" />
+                                                                                <Clock className="w-3 h-3" />
                                                                                 {q.duration_minutes ||
                                                                                     60}{' '}
                                                                                 Menit
@@ -380,7 +380,7 @@ export default function Show({ classroom, materials, quizzes = [] }) {
                                                                                 size="icon"
                                                                                 className="rounded-full"
                                                                             >
-                                                                                <MoreVertical className="h-4 w-4 text-muted-foreground" />
+                                                                                <MoreVertical className="w-4 h-4 text-muted-foreground" />
                                                                             </Button>
                                                                         </DropdownMenuTrigger>
                                                                         <DropdownMenuContent
@@ -388,12 +388,12 @@ export default function Show({ classroom, materials, quizzes = [] }) {
                                                                             className="rounded-2xl"
                                                                         >
                                                                             <DropdownMenuItem className="gap-2">
-                                                                                <FileText className="h-4 w-4" />{' '}
+                                                                                <FileText className="w-4 h-4" />{' '}
                                                                                 Detail
                                                                                 Quiz
                                                                             </DropdownMenuItem>
                                                                             <DropdownMenuItem className="gap-2 text-destructive">
-                                                                                <Trash2 className="h-4 w-4" />{' '}
+                                                                                <Trash2 className="w-4 h-4" />{' '}
                                                                                 Hapus
                                                                             </DropdownMenuItem>
                                                                         </DropdownMenuContent>
@@ -409,7 +409,7 @@ export default function Show({ classroom, materials, quizzes = [] }) {
                                                                                 'Tidak ada'}
                                                                         </span>
                                                                     </div>
-                                                                    <Link href="#">
+                                                                    <Link href={route('guru.quizes.show', q.id)}>
                                                                         <Button
                                                                             size="sm"
                                                                             variant="outline"
@@ -431,13 +431,13 @@ export default function Show({ classroom, materials, quizzes = [] }) {
                                                 animate={{ opacity: 1 }}
                                                 className="flex flex-col items-center justify-center rounded-[3rem] border-2 border-dashed border-border/50 bg-muted/20 py-24 text-center"
                                             >
-                                                <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-background shadow-inner">
-                                                    <ClipboardList className="h-12 w-12 text-muted-foreground/30" />
+                                                <div className="flex items-center justify-center w-24 h-24 mb-6 rounded-full shadow-inner bg-background">
+                                                    <ClipboardList className="w-12 h-12 text-muted-foreground/30" />
                                                 </div>
                                                 <h3 className="text-2xl font-black text-muted-foreground/60">
                                                     Belum ada Quiz
                                                 </h3>
-                                                <p className="mt-2 max-w-sm font-medium text-muted-foreground">
+                                                <p className="max-w-sm mt-2 font-medium text-muted-foreground">
                                                     Evaluasi kemampuan siswa
                                                     dengan membuat quiz
                                                     interaktif.

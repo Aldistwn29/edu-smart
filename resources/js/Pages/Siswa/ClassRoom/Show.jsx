@@ -39,24 +39,24 @@ export default function Show({
     return (
         <DashbordLayout>
             <Head title={`Kelas ${classroom.name}`} />
-            <div className="animate-fade-in space-y-8 pb-10">
+            <div className="pb-10 space-y-8 animate-fade-in">
                 <div className="flex items-center">
                     <Link
                         href={route('siswa.classroom.index')}
-                        className="group flex items-center gap-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-primary"
+                        className="flex items-center gap-2 text-sm font-semibold transition-colors group text-muted-foreground hover:text-primary"
                     >
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-card shadow-sm ring-1 ring-border/50 transition-all group-hover:bg-primary group-hover:text-primary-foreground group-hover:ring-primary">
-                            <ChevronLeft className="h-6 w-6" />
+                        <div className="flex items-center justify-center w-10 h-10 transition-all shadow-sm rounded-xl bg-card ring-1 ring-border/50 group-hover:bg-primary group-hover:text-primary-foreground group-hover:ring-primary">
+                            <ChevronLeft className="w-6 h-6" />
                         </div>
                         Kembali ke Daftar Kelas
                     </Link>
                 </div>
-                <Card className="gradient-card relative overflow-hidden rounded-lg border-none shadow-lg ring-1 ring-white/50">
+                <Card className="relative overflow-hidden border-none rounded-lg shadow-lg gradient-card ring-1 ring-white/50">
                     <CardContent className="flex flex-col items-center justify-between gap-10 p-8 md:flex-row md:p-12">
                         <div className="flex-1 space-y-6 text-center md:text-left">
                             <Badge
                                 variant="secondry"
-                                className="rounded-full border-none bg-primary/10 px-4 py-2 text-xs font-bold uppercase tracking-wider text-primary hover:bg-primary/20"
+                                className="px-4 py-2 text-xs font-bold tracking-wider uppercase border-none rounded-full bg-primary/10 text-primary hover:bg-primary/20"
                             >
                                 {classroom?.subject || 'Mata Pelajaran'}
                             </Badge>
@@ -79,15 +79,15 @@ export default function Show({
                                         {progressValue}%
                                     </p>
                                 </div>
-                                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-warning/10 text-warning">
-                                    <Trophy className="h-6 w-6" />
+                                <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-warning/10 text-warning">
+                                    <Trophy className="w-6 h-6" />
                                 </div>
                             </div>
                             <Progress
                                 value={progressValue}
                                 className="h-3 bg-secondary"
                             />
-                            <p className="text-center text-sm font-bold italic text-muted-foreground">
+                            <p className="text-sm italic font-bold text-center text-muted-foreground">
                                 {progressValue === 100
                                     ? 'Luar biasa! Kamu sudah menguasai semuanya!'
                                     : '"Sedikit lagi S.Kom, Ayoo!"'}
@@ -105,8 +105,8 @@ export default function Show({
                         >
                             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                                 <div className="flex items-center gap-3">
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                                        <BookOpen className="h-6 w-6" />
+                                    <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-primary/10 text-primary">
+                                        <BookOpen className="w-6 h-6" />
                                     </div>
                                     <div>
                                         <h2 className="text-2xl font-bold tracking-tight">
@@ -118,8 +118,8 @@ export default function Show({
                                         </p>
                                     </div>
                                 </div>
-                                <div className="no-scrollbar flex overflow-x-auto pb-2 sm:pb-0">
-                                    <TabsList className="glass h-12 w-fit shrink-0 rounded-full border-border/50 p-1 shadow-sm">
+                                <div className="flex pb-2 overflow-x-auto no-scrollbar sm:pb-0">
+                                    <TabsList className="h-12 p-1 rounded-full shadow-sm glass w-fit shrink-0 border-border/50">
                                         <TabsTrigger
                                             value="all"
                                             className="rounded-full px-6 text-sm font-bold transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
@@ -138,7 +138,7 @@ export default function Show({
 
                             <TabsContent
                                 value={activeTab}
-                                className="animate-fade-in-up space-y-4"
+                                className="space-y-4 animate-fade-in-up"
                             >
                                 {filteredMaterials.length > 0 ? (
                                     filteredMaterials.map((material) => {
@@ -150,20 +150,20 @@ export default function Show({
                                                 key={material.id}
                                                 className="group relative overflow-hidden rounded-[2.5rem] border-none bg-card shadow-sm ring-1 ring-border/50 transition-all duration-300 hover:bg-white hover:shadow-2xl hover:shadow-primary/5"
                                             >
-                                                <div className="absolute right-0 top-0 h-32 w-32 -translate-y-16 translate-x-16 rounded-full bg-primary/5 blur-3xl transition-colors group-hover:bg-primary/10" />
+                                                <div className="absolute top-0 right-0 w-32 h-32 transition-colors translate-x-16 -translate-y-16 rounded-full bg-primary/5 blur-3xl group-hover:bg-primary/10" />
                                                 <CardContent className="flex flex-col gap-6 p-8 md:flex-row md:items-center">
                                                     <div className="relative flex-shrink-0">
                                                         <div
                                                             className={`flex h-20 w-20 items-center justify-center rounded-3xl transition-all duration-500 group-hover:rotate-3 group-hover:scale-110 ${isCompleted ? 'bg-success/10' : 'bg-secondary'}`}
                                                         >
                                                             {isCompleted ? (
-                                                                <CheckCircle2 className="h-10 w-10 text-success" />
+                                                                <CheckCircle2 className="w-10 h-10 text-success" />
                                                             ) : (
-                                                                <BookOpen className="h-10 w-10 text-primary" />
+                                                                <BookOpen className="w-10 h-10 text-primary" />
                                                             )}
                                                         </div>
                                                         {isCompleted && (
-                                                            <div className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full border-4 border-card bg-success" />
+                                                            <div className="absolute w-5 h-5 border-4 rounded-full -bottom-1 -right-1 border-card bg-success" />
                                                         )}
                                                     </div>
                                                     <div className="flex-1 space-y-4">
@@ -177,7 +177,7 @@ export default function Show({
                                                                         material.type
                                                                     }
                                                                 </span>
-                                                                <span className="h-1 w-1 rounded-full bg-border" />
+                                                                <span className="w-1 h-1 rounded-full bg-border" />
                                                                 <Badge
                                                                     variant="outline"
                                                                     className={`font-bold ${isCompleted ? 'border-success/20 bg-success/10 text-success' : 'border-primary/20 bg-primary/5 text-primary'}`}
@@ -206,10 +206,11 @@ export default function Show({
                                                             </div>
                                                         )}
                                                     </div>
-                                                    <div className="flex flex-shrink-0 items-center justify-center md:items-end">
+                                                    <div className="flex items-center justify-center flex-shrink-0 md:items-end">
                                                         <Link
                                                             href={route(
-                                                                'siswa.classroom.index',
+                                                                'siswa.materies.show',
+                                                                material.id
                                                             )}
                                                             className="w-full md:w-auto"
                                                         >
@@ -219,7 +220,7 @@ export default function Show({
                                                                 {isCompleted
                                                                     ? 'Lihat Kembali'
                                                                     : 'Lanjut Belajar'}
-                                                                <ArrowRight className="h-5 w-5" />
+                                                                <ArrowRight className="w-5 h-5" />
                                                             </Button>
                                                         </Link>
                                                     </div>
@@ -229,8 +230,8 @@ export default function Show({
                                     })
                                 ) : (
                                     <div className="py-20 text-center">
-                                        <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-muted">
-                                            <BookOpen className="h-8 w-8 text-muted-foreground/50" />
+                                        <div className="inline-flex items-center justify-center w-16 h-16 mb-4 rounded-full bg-muted">
+                                            <BookOpen className="w-8 h-8 text-muted-foreground/50" />
                                         </div>
                                         <p className="text-lg font-bold text-foreground">
                                             Belum ada materi
@@ -248,14 +249,14 @@ export default function Show({
                     {/* Sidebar / Info Tambahan */}
                     <div className="space-y-8 lg:col-span-4">
                         {/* Profile Section */}
-                        <Card className="overflow-hidden rounded-3xl border-none bg-card shadow-sm ring-1 ring-border/50">
-                            <div className="gradient-hero h-28 w-full opacity-90" />
+                        <Card className="overflow-hidden border-none shadow-sm rounded-3xl bg-card ring-1 ring-border/50">
+                            <div className="w-full gradient-hero h-28 opacity-90" />
                             <CardContent className="relative px-6 pb-8 text-center">
-                                <div className="-mt-14 mb-4 flex justify-center">
+                                <div className="flex justify-center mb-4 -mt-14">
                                     <Avatar className="h-28 w-28 border-[6px] border-card shadow-2xl transition-transform duration-500 hover:rotate-3 hover:scale-105">
                                         <AvatarImage src="" />
                                         <AvatarFallback className="bg-secondary text-primary">
-                                            <User className="h-12 w-12" />
+                                            <User className="w-12 h-12" />
                                         </AvatarFallback>
                                     </Avatar>
                                 </div>
@@ -269,7 +270,7 @@ export default function Show({
                                     </div>
                                 </div>
 
-                                <div className="mt-8 grid grid-cols-2 gap-4 border-t border-border/50 pt-8">
+                                <div className="grid grid-cols-2 gap-4 pt-8 mt-8 border-t border-border/50">
                                     <div className="space-y-1 text-left">
                                         <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                                             Total Materi
@@ -295,26 +296,26 @@ export default function Show({
                         <Card className="overflow-hidden rounded-[2.5rem] border-none bg-card shadow-sm ring-1 ring-border/50">
                             <CardHeader className="pb-4">
                                 <CardTitle className="flex items-center gap-4 text-xl font-bold">
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                                        <CalendarIcon className="h-6 w-6" />
+                                    <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-primary/10 text-primary">
+                                        <CalendarIcon className="w-6 h-6" />
                                     </div>
                                     Jadwal Kelas
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="p-0">
-                                <div className="flex justify-center border-b p-3">
+                                <div className="flex justify-center p-3 border-b">
                                     <Calendar
                                         mode="single"
                                         selected={date}
                                         onSelect={setDate}
-                                        className="rounded-md border-none"
+                                        className="border-none rounded-md"
                                     />
                                 </div>
 
-                                <div className="space-y-6 p-6">
+                                <div className="p-6 space-y-6">
                                     <div className="flex items-start gap-4">
-                                        <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-100 text-orange-600">
-                                            <Clock className="h-5 w-5" />
+                                        <div className="flex items-center justify-center w-10 h-10 mt-1 text-orange-600 bg-orange-100 shrink-0 rounded-xl">
+                                            <Clock className="w-5 h-5" />
                                         </div>
                                         <div className="space-y-1">
                                             <p className="font-bold text-foreground">
@@ -327,8 +328,8 @@ export default function Show({
                                     </div>
 
                                     <div className="flex items-start gap-4">
-                                        <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
-                                            <BookOpen className="h-5 w-5" />
+                                        <div className="flex items-center justify-center w-10 h-10 mt-1 text-blue-600 bg-blue-100 shrink-0 rounded-xl">
+                                            <BookOpen className="w-5 h-5" />
                                         </div>
                                         <div className="space-y-1">
                                             <p className="font-bold text-foreground">
@@ -342,7 +343,7 @@ export default function Show({
 
                                     <Button
                                         variant="outline"
-                                        className="h-11 w-full rounded-2xl border-2 font-bold transition-all hover:border-primary hover:bg-primary hover:text-primary-foreground"
+                                        className="w-full font-bold transition-all border-2 h-11 rounded-2xl hover:border-primary hover:bg-primary hover:text-primary-foreground"
                                     >
                                         Lihat Semua Jadwal
                                     </Button>

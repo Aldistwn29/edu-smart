@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -109,11 +110,13 @@ class QuizController
             'questions.*.type' => 'required|in:multiple_choice,true_false',
             'questions.*.points' => 'required|integer|min:0',
             'questions.*.options' => 'required|array|min:2',
-            'questions.*.options.*.option_text' => 'required|string',
-            'questions.*.options.*.is_correct' => 'required',
+            'questions.*.options.*.option_text' => 'nullable|string',
+            'questions.*.options.*.is_correct' => 'boolean',
         ], $messages);
 
         try {
+            $questions = $this->prepareQuestions($request->questions);
+
             DB::beginTransaction();
 
             $deadline = Carbon::parse($request->deadline_date.' '.$request->deadline_time);
@@ -127,23 +130,16 @@ class QuizController
                 'deadline' => $deadline,
             ]);
 
-            foreach ($request->questions as $index => $q) {
-                // Deteksi jawaban benar dengan lebih fleksibel
-                $correctOption = collect($q['options'])->first(function ($opt) {
-                    $isCorrect = $opt['is_correct'];
-
-                    return $isCorrect === true || $isCorrect === 1 || $isCorrect === '1' || $isCorrect === 'true' || $isCorrect === 'on';
-                });
-
-                $correctAnswer = $correctOption['option_text'] ?? '';
+            foreach ($questions as $index => $question) {
+                $correctAnswer = $question['answer'];
 
                 $quiz->questions()->create([
-                    'question' => $q['text'],
-                    'type' => $q['type'],
-                    'options' => $q['options'],
+                    'question' => $question['question'],
+                    'type' => $question['type'],
+                    'options' => $question['options'],
                     'answer' => $correctAnswer,
-                    'points' => $q['points'],
-                    'order' => $index + 1,
+                    'points' => $question['points'],
+                    'order' => $question['order'],
                 ]);
             }
 
@@ -158,7 +154,7 @@ class QuizController
 
             DB::commit();
 
-            return redirect()->route('guru.quizes.index')->with('success', 'Quiz berhasil dibuat');
+            return redirect()->route('guru.quizes.index', [], 303)->with('success', 'Quiz berhasil dibuat');
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Gagal membuat quiz: '.$e->getMessage(), [
@@ -166,7 +162,7 @@ class QuizController
                 'request' => $request->all(),
             ]);
 
-            return back()->withInput()->with('error', 'Gagal membuat quiz. Silakan coba lagi.');
+            return redirect()->route('guru.quizes.create', [], 303)->withInput()->with('error', 'Gagal membuat quiz. Silakan coba lagi.');
         }
     }
 
@@ -211,11 +207,13 @@ class QuizController
             'questions.*.type' => 'required|in:multiple_choice,true_false',
             'questions.*.points' => 'required|integer|min:0',
             'questions.*.options' => 'required|array|min:2',
-            'questions.*.options.*.option_text' => 'required|string',
-            'questions.*.options.*.is_correct' => 'required',
+            'questions.*.options.*.option_text' => 'nullable|string',
+            'questions.*.options.*.is_correct' => 'boolean',
         ], $messages);
 
         try {
+            $questions = $this->prepareQuestions($request->questions);
+
             DB::beginTransaction();
 
             $deadline = Carbon::parse($request->deadline_date.' '.$request->deadline_time);
@@ -229,21 +227,16 @@ class QuizController
 
             $quiz->questions()->delete();
 
-            foreach ($request->questions as $index => $q) {
-                $correctOption = collect($q['options'])->first(function ($opt) {
-                    $isCorrect = $opt['is_correct'];
-
-                    return $isCorrect === true || $isCorrect === 1 || $isCorrect === '1' || $isCorrect === 'true' || $isCorrect === 'on';
-                });
-                $correctAnswer = $correctOption['option_text'] ?? '';
+            foreach ($questions as $index => $question) {
+                $correctAnswer = $question['answer'];
 
                 $quiz->questions()->create([
-                    'question' => $q['text'],
-                    'type' => $q['type'],
-                    'options' => $q['options'],
+                    'question' => $question['question'],
+                    'type' => $question['type'],
+                    'options' => $question['options'],
                     'answer' => $correctAnswer,
-                    'points' => $q['points'],
-                    'order' => $index + 1,
+                    'points' => $question['points'],
+                    'order' => $question['order'],
                 ]);
             }
 
@@ -258,7 +251,7 @@ class QuizController
 
             DB::commit();
 
-            return redirect()->route('guru.quizes.index')->with('success', 'Quiz berhasil diupdate');
+            return redirect()->route('guru.quizes.index', [], 303)->with('success', 'Quiz berhasil diupdate');
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Gagal mengupdate quiz: '.$e->getMessage(), [
@@ -266,7 +259,7 @@ class QuizController
                 'teacher_id' => Auth::id(),
             ]);
 
-            return back()->with('error', 'Gagal mengupdate quiz. Silakan coba lagi.');
+            return redirect()->route('guru.quizes.edit', $quiz, 303)->with('error', 'Gagal mengupdate quiz. Silakan coba lagi.');
         }
     }
 
@@ -309,6 +302,53 @@ class QuizController
 
         $quiz->delete();
 
-        return redirect()->route('guru.quizes.index')->with('success', 'Quiz berhasil dihapus');
+        return redirect()->route('guru.quizes.index', [], 303)->with('success', 'Quiz berhasil dihapus');
+    }
+
+    private function prepareQuestions(array $questions): array
+    {
+        return collect($questions)->map(function (array $question, int $index) {
+            $options = collect($question['options'] ?? [])
+                ->map(function (array $option) {
+                    return [
+                        'option_text' => trim((string) ($option['option_text'] ?? '')),
+                        'is_correct' => filter_var($option['is_correct'] ?? false, FILTER_VALIDATE_BOOL),
+                    ];
+                })
+                ->values();
+
+            $filledOptions = $options->filter(function (array $option) {
+                return $option['option_text'] !== '';
+            })->values();
+
+            if ($filledOptions->count() < 2) {
+                throw ValidationException::withMessages([
+                    "questions.$index.options" => 'Tolong isi minimal 2 opsi jawaban.',
+                ]);
+            }
+
+            $correctOption = $filledOptions->first(function (array $option) {
+                return $option['is_correct'] === true;
+            });
+
+            if (! $correctOption) {
+                $correctOption = $filledOptions->first();
+            }
+
+            if (! $correctOption) {
+                throw ValidationException::withMessages([
+                    "questions.$index.options" => 'Pilih salah satu opsi sebagai jawaban benar.',
+                ]);
+            }
+
+            return [
+                'question' => $question['text'],
+                'type' => $question['type'],
+                'options' => $options->all(),
+                'answer' => $correctOption['option_text'],
+                'points' => $question['points'],
+                'order' => $index + 1,
+            ];
+        })->all();
     }
 }

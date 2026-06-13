@@ -49,11 +49,6 @@ export default function DashbordLayout({ children }) {
                       label: 'Quiz',
                       href: route('guru.quizes.index'),
                   },
-                  {
-                      icon: Notebook,
-                      label: 'Penugasan',
-                      href: route('guru.assigments.index'),
-                  },
               ]
             : [
                   {
@@ -86,7 +81,6 @@ export default function DashbordLayout({ children }) {
                       label: 'Ai Chatbot',
                       href: route('siswa.chatbotai.index'),
                   },
-                  { icon: Settings, label: 'Pengaturan', href: '#' },
               ];
 
     const logout = () => {

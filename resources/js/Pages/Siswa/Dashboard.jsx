@@ -48,7 +48,7 @@ export default function SiswaDashboard({
     return (
         <DashboardLayout>
             <Head title="Dashboard Siswa" />
-            <div className="space-y-8 pb-10">
+            <div className="pb-10 space-y-8">
                 <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
                     {/* Header */}
                     <div>
@@ -62,9 +62,9 @@ export default function SiswaDashboard({
                             Yuk Lanjutkan belajarmu hari ini!
                         </p>
                     </div>
-                    <Link href="#">
+                    <Link href={route("siswa.chatbotai.index")}>
                         <Button variant="outline" size="lg">
-                            <MessageSquare className="mr-2 h-4 w-4" />
+                            <MessageSquare className="w-4 h-4 mr-2" />
                             Tanya Mas Mas AI
                         </Button>
                     </Link>
@@ -74,7 +74,7 @@ export default function SiswaDashboard({
                     {kpiData.map((item, i) => (
                         <Card
                             keys={i}
-                            className="shadwo-md rounded-2xl border-none"
+                            className="border-none shadwo-md rounded-2xl"
                         >
                             <CardContent className="flex items-center justify-between p-6">
                                 <div>
@@ -85,7 +85,7 @@ export default function SiswaDashboard({
                                         {item.value}
                                     </p>
                                 </div>
-                                <div className="rounded-xl bg-slate-50 p-3">
+                                <div className="p-3 rounded-xl bg-slate-50">
                                     <item.icon
                                         className={`h-5 w-5 ${item.color}`}
                                     />
@@ -104,10 +104,10 @@ export default function SiswaDashboard({
                             </h3>
                             <Link
                                 href="#"
-                                className="flex items-center text-xs font-semibold text-slate-900 transition-colors hover:text-primary"
+                                className="flex items-center text-xs font-semibold transition-colors text-slate-900 hover:text-primary"
                             >
                                 Lihat Semua
-                                <ChevronRight className="ml-1 h-4 w-4" />
+                                <ChevronRight className="w-4 h-4 ml-1" />
                             </Link>
                         </div>
                         <CardContent className="space-y-8">
@@ -116,7 +116,7 @@ export default function SiswaDashboard({
                                     <div className="flex flex-col space-y-3">
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-4">
-                                                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 font-bold text-slate-500">
+                                                <div className="flex items-center justify-center w-12 h-12 font-bold rounded-xl bg-slate-100 text-slate-500">
                                                     {item.subject
                                                         .substring(0, 2)
                                                         .toUpperCase()}
@@ -143,63 +143,48 @@ export default function SiswaDashboard({
                             ))}
                             <Link href="#">
                                 <Button
-                                    className="mt-4 w-full"
+                                    className="w-full mt-4"
                                     variant="outline"
                                 >
-                                    <PlayCircle className="mr-2 h-5 w-5 text-primary" />
+                                    <PlayCircle className="w-5 h-5 mr-2 text-primary" />
                                     Lanjutkan Belajar
                                 </Button>
                             </Link>
                         </CardContent>
                     </Card>
                     {/* Right: Quiz Terakhir */}
-                    <Card className="rounded-2xl border-none p-4 shadow-sm">
+                    <Card className="p-4 border-none shadow-sm rounded-2xl">
                         <div className="flex items-center justify-between p-6">
                             <h3 className="text-xl font-semibold text-slate-800">
                                 Quiz terakhir
                             </h3>
-                            <ChevronRight className="h-5 w-5 text-slate-800" />
+                            <ChevronRight className="w-5 h-5 text-slate-800" />
                         </div>
                         <CardContent className="space-y-4">
                             {quiz_terakhir.length > 0 ? (
                                 quiz_terakhir.map((quiz) => (
                                     <div
                                         key={quiz.id}
-                                        className="group flex cursor-pointer items-center justify-between rounded-2xl border border-slate-100 p-4 transition-all hover:border-primary/50 hover:bg-primary/5"
+                                        className="flex items-center justify-between p-4 transition-all border cursor-pointer group rounded-2xl border-slate-100 hover:border-primary/50 hover:bg-primary/5"
                                     >
                                         <div className="space-y-1">
-                                            <h4 className="font-semibold text-slate-800 transition-colors group-hover:text-primary">
+                                            <h4 className="font-semibold transition-colors text-slate-800 group-hover:text-primary">
                                                 {quiz.title}
                                             </h4>
                                             <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
                                                 {quiz.subject} • {quiz.date}
                                             </p>
                                         </div>
-                                        <div className="flex h-10 w-10 items-center justify-center rounded-full border-4 border-primary/20 text-xs font-bold text-primary">
+                                        <div className="flex items-center justify-center w-10 h-10 text-xs font-bold border-4 rounded-full border-primary/20 text-primary">
                                             {quiz.score}
                                         </div>
                                     </div>
                                 ))
                             ) : (
-                                <p className="py-10 text-center text-sm text-muted-foreground">
+                                <p className="py-10 text-sm text-center text-muted-foreground">
                                     Belum ada quiz dikerjakan
                                 </p>
                             )}
-
-                            <div className="mt-6 space-y-4 rounded-2xl border border-primary/10 bg-primary/5 p-6">
-                                <Link href="#">
-                                    <p className="text-center text-sm font-semibold text-slate-700">
-                                        Analisis Permorma belajar anda, tanya
-                                        mas AI aja.
-                                    </p>
-                                    <Button
-                                        variant="outline"
-                                        className="mt-4 w-full"
-                                    >
-                                        Tanya Mas AI
-                                    </Button>
-                                </Link>
-                            </div>
                         </CardContent>
                     </Card>
                 </div>

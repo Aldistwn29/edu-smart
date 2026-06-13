@@ -48,8 +48,53 @@ class QuizControllerTest extends TestCase
 
         $quiz = Quize::query()->latest('id')->firstOrFail();
 
-        $response->assertRedirect(route('guru.quizes.show', $quiz, false));
+        $response->assertRedirect(route('guru.quizes.index', absolute: false));
         $this->assertSame('Quiz Dasar', $quiz->title);
+    }
+
+    public function test_store_allows_multiple_choice_with_blank_option_slots(): void
+    {
+        $teacher = User::factory()->create([
+            'role' => 'guru',
+        ]);
+
+        $classroom = ClassRoom::query()->create([
+            'teacher_id' => $teacher->id,
+            'name' => 'Kelas B',
+            'subject' => 'Matematika',
+            'description' => 'Kelas percobaan',
+            'academic_year' => '2025/2026',
+        ]);
+
+        $response = $this->actingAs($teacher)->post(route('guru.quizes.store'), [
+            'class_id' => $classroom->id,
+            'title' => 'Quiz Pilihan Ganda',
+            'description' => 'Opsi kosong masih boleh disimpan',
+            'duration_minutes' => 20,
+            'deadline_date' => now()->addDay()->format('Y-m-d'),
+            'deadline_time' => '13:00',
+            'questions' => [
+                [
+                    'text' => '2 + 2 = ?',
+                    'type' => 'multiple_choice',
+                    'points' => 10,
+                    'options' => [
+                        ['option_text' => '3', 'is_correct' => false],
+                        ['option_text' => '4', 'is_correct' => true],
+                        ['option_text' => '', 'is_correct' => false],
+                        ['option_text' => '', 'is_correct' => false],
+                    ],
+                ],
+            ],
+        ]);
+
+        $quiz = Quize::query()->latest('id')->firstOrFail();
+
+        $response->assertRedirect(route('guru.quizes.index', absolute: false));
+        $this->assertSame('Quiz Pilihan Ganda', $quiz->title);
+        $this->assertCount(1, $quiz->questions);
+        $this->assertSame('4', $quiz->questions->first()->answer);
+        $this->assertCount(4, $quiz->questions->first()->options);
     }
 
     public function test_update_redirects_to_the_quiz_page(): void
@@ -95,7 +140,7 @@ class QuizControllerTest extends TestCase
             ],
         ]);
 
-        $response->assertRedirect(route('guru.quizes.show', $quiz, false));
+        $response->assertRedirect(route('guru.quizes.index', absolute: false));
         $this->assertSame('Quiz Baru', $quiz->fresh()->title);
     }
 }
