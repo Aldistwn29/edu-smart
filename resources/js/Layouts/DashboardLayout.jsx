@@ -49,6 +49,11 @@ export default function DashbordLayout({ children }) {
                       label: 'Quiz',
                       href: route('guru.quizes.index'),
                   },
+                   {
+                      icon: Notebook,
+                      label: 'Penugasan',
+                      href: route('guru.assigments.index'),
+                  },
               ]
             : [
                   {
